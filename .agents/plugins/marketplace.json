@@ -1,0 +1,12 @@
+{
+  "name": "mr-brief",
+  "interface": { "displayName": "mr brief" },
+  "plugins": [
+    {
+      "name": "mr-brief",
+      "source": { "source": "url", "url": "https://github.com/kenjione/mr-brief.git", "ref": "main" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}

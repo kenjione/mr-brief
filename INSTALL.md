@@ -16,8 +16,7 @@ Then, on a branch that is ready for review:
 It reads the diff against the remote target branch and writes `tmp/mr-brief/brief.md` (or `.mr-brief.md` when `tmp/` is not ignored).
 
 Left to itself, a hook offers the brief once per branch, at the moment a command opens
-an MR, and stops at a no — see *Opt-in by design* in the README, including the one-line
-edits for "never ask me" and "never ask, just write it". Requires `node` on the path,
+an MR, and stops at a no — see *Opt-in, on purpose* in the README. Requires `node` on the path,
 which Claude Code already needs.
 
 ## Without the plugin system
