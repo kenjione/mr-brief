@@ -1,0 +1,18 @@
+{
+  "name": "mr-brief",
+  "version": "0.3.0",
+  "description": "Write merge/pull request descriptions a reviewer actually reads: 25 lines, three places to look, one diagram only when the wiring changed.",
+  "author": {
+    "name": "Alex Chernyshev",
+    "url": "https://github.com/kenjione"
+  },
+  "keywords": [
+    "code-review",
+    "merge-request",
+    "pull-request",
+    "gitlab",
+    "mermaid",
+    "productivity"
+  ],
+  "license": "MIT"
+}

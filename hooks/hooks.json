@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/offer.mjs\"",
+            "timeout": 10,
+            "statusMessage": "mr-brief: is this an MR being opened?"
+          }
+        ]
+      }
+    ]
+  }
+}

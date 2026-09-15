@@ -1,0 +1,17 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "mr-brief",
+  "description": "Reviewer-first merge request descriptions. Hard limits, three places to look, a diagram only when it earns its place.",
+  "owner": {
+    "name": "Alex Chernyshev",
+    "url": "https://github.com/kenjione"
+  },
+  "plugins": [
+    {
+      "name": "mr-brief",
+      "description": "Write MR/PR descriptions a reviewer actually reads.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

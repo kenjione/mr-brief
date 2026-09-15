@@ -1,0 +1,22 @@
+# Drop into your .gitlab-ci.yml. Lints the MR description against the mr-brief contract and
+# posts the result as a comment. Never fails the pipeline: `allow_failure: true`.
+lint-mr-description:
+  stage: test
+  image: node:20-alpine
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  allow_failure: true
+  before_script:
+    - apk add --no-cache git curl
+    - git clone --depth 1 https://github.com/kenjione/mr-brief.git /tmp/mr-brief
+  script:
+    - |
+      curl -s --header "PRIVATE-TOKEN: $MR_BRIEF_TOKEN" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID" \
+        | node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(0,"utf8")).description||"")' > /tmp/desc.md
+      if ! grep -q "mr-brief v1" /tmp/desc.md; then echo "no mr-brief marker — skipping"; exit 0; fi
+      node /tmp/mr-brief/scripts/lint.mjs /tmp/desc.md | tee /tmp/lint.txt || true
+      BODY=$(printf 'mr-brief lint\n```\n%s\n```' "$(cat /tmp/lint.txt)")
+      curl -s --request POST --header "PRIVATE-TOKEN: $MR_BRIEF_TOKEN" \
+        --data-urlencode "body=$BODY" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" > /dev/null

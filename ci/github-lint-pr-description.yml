@@ -1,0 +1,26 @@
+# .github/workflows/lint-pr-description.yml — lints the PR body against the mr-brief
+# contract and comments the result. Never blocks: continue-on-error.
+name: lint-pr-description
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions: { pull-requests: write }
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: kenjione/mr-brief, path: mr-brief }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: lint
+        env: { BODY: "${{ github.event.pull_request.body }}" }
+        run: |
+          printf '%s' "$BODY" > desc.md
+          grep -q "mr-brief v1" desc.md || { echo "no mr-brief marker — skipping"; exit 0; }
+          node mr-brief/scripts/lint.mjs desc.md | tee lint.txt || true
+      - name: comment
+        if: always()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: test -f lint.txt && gh pr comment ${{ github.event.pull_request.number }} --body "$(printf 'mr-brief lint\n```\n%s\n```' "$(cat lint.txt)")" || true

@@ -1,0 +1,19 @@
+name: check
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: manifests are valid JSON
+        run: node -e 'for (const f of [".claude-plugin/plugin.json",".claude-plugin/marketplace.json","hooks/hooks.json"]) JSON.parse(require("fs").readFileSync(f,"utf8"))'
+      - name: scripts parse
+        run: for f in hooks/*.mjs scripts/*.mjs evals/*.mjs; do node --check "$f"; done
+      - name: the shipped example passes its own lint
+        run: node scripts/lint.mjs examples/subscription-addon-cascade.md
+      - name: lint fixtures
+        run: node --test evals/lint.test.mjs
+      - name: runtime copies are in sync
+        run: node scripts/sync-runtimes.mjs --check
