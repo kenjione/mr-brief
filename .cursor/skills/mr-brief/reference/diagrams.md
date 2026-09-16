@@ -1,5 +1,43 @@
 # Diagrams
 
+## Rendered, when the renderer is there
+
+Mermaid is the portable form and stays in the description as the editable source. When
+`npx` is available, draw the pictures properly with the PR Lens renderer (MIT, offline):
+one graph document gives both lenses — **architecture** (lanes per service, typed nodes,
+NEW / CHANGED badges, new edges green) and **data-flow** (a sequence with lifelines). On
+GitLab the SVGs are uploaded and embedded as images above Key changes; the mermaid moves
+under `<details>`. On GitHub there is no upload API — the mermaid stays where it is.
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/render.mjs" tmp/mr-brief/graph.json --mr <iid>
+```
+
+The graph document, in the parts that matter (`pr-lens validate` checks the rest):
+
+```json
+{ "schemaVersion": "0.2.0", "kind": "graph", "id": "billing-sweep", "generatedAt": "…",
+  "title": "…", "summary": "…", "lenses": ["architecture", "data-flow"],
+  "provenance": { "repo": {"host":"gitlab.com","owner":"g","name":"r"}, "base": {"ref":"main","sha":"…40 hex…"}, "head": {"ref":"feat","sha":"…"}, "generator": {"name":"mr-brief","version":"0.7.0"} },
+  "lanes": [ { "id": "billing", "label": "billing", "order": 1, "delta": "modified" } ],
+  "nodes": [ { "id": "sweep", "label": "Sweep worker", "kind": "job", "delta": "added", "lane": "billing", "subtitle": "nightly · retry 3" } ],
+  "edges": [ { "id": "e1", "from": "sweep", "to": "pay", "kind": "http", "delta": "added", "label": "cancel add-ons" } ],
+  "flows": [ { "id": "f1", "title": "Cancel", "delta": "added", "participants": [{"node":"sweep"},{"node":"pay"}],
+              "messages": [ { "id": "m1", "from": "sweep", "to": "pay", "label": "POST cancel", "kind": "sync", "delta": "added" } ] } ],
+  "stats": { "filesChanged": 20, "additions": 402, "deletions": 2 } }
+```
+
+- `delta` is the highlight: `added` · `modified` · `removed` · `unchanged`. Nothing else marks
+  what is new — so every node and edge carries one.
+- `kind` picks the icon: `service app module function route job queue datastore cache
+  external ui config test package other`; edges: `call http rpc event queue data dependency`.
+- One lane per service or boundary; the reviewer's own service is a lane, external systems
+  are `external` nodes in their own lane.
+- **Labels ≤ 22 characters** — longer ones are cut with an ellipsis. Put the rest in `subtitle`.
+- Message kinds: `sync` · `async` · `return` · `self`. A `self` message is a guard or a decision.
+- Never a real identifier, token or customer value in a label — the same rule as everywhere.
+
+
 Loaded only when the gate in `SKILL.md` passes. The diagram sits above the key changes
 and is never collapsed: it is the one element that replaces reading instead of adding to
 it.

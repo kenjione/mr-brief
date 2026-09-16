@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.0
+- `render.mjs`: both pictures drawn with the PR Lens renderer (MIT, offline) from one graph document — lanes, typed nodes, NEW / CHANGED badges, a real sequence — uploaded to the MR on GitLab and embedded above Key changes. Mermaid stays as the editable source under details, and as the picture on GitHub.
+
 ## 0.6.0
 - The reading guide under `<details>`: for each core file, what changed · what to check, and its decisive hunk as a `diff` block cut by `excerpt.mjs` — ten lines at most. Then skip and moved-not-changed. The diff made edible without leaving the description.
 

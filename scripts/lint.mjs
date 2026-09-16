@@ -16,16 +16,17 @@ const fail = [];
 if (!/<!--\s*mr-brief v1\s*-->/.test(lines[0] ?? "")) fail.push("first line must carry <!-- mr-brief v1 -->");
 
 // ---- carve out what does not count as text: mermaid blocks (+ one legend line), <details>
-let inMermaid = false, inDetails = false, afterMermaid = false, mermaidBlocks = 0, mermaidAt = -1;
+let inMermaid = false, inDetails = false, afterMermaid = false, mermaidBlocks = 0, mermaidAt = -1, pictures = 0, pictureAt = -1;
 const text = []; // {i, s}
 lines.forEach((raw, i) => {
   const s = raw.trimEnd();
+  if (inDetails) { if (/^<\/details>/.test(s.trim())) inDetails = false; return; } // everything under details is out of scope, mermaid source included
   if (/^```mermaid\s*$/.test(s)) { inMermaid = true; mermaidBlocks++; mermaidAt = i; return; }
   if (inMermaid) { if (/^```\s*$/.test(s)) { inMermaid = false; afterMermaid = true; } return; }
   if (afterMermaid) { afterMermaid = false; if (/^[*_].*[*_]\s*$/.test(s.trim())) return; } // legend
   if (/^<details>/.test(s.trim())) { inDetails = true; return; }
-  if (inDetails) { if (/^<\/details>/.test(s.trim())) inDetails = false; return; }
   if (s.trim() === "" || s.trim() === ">" || /^-{3,}$/.test(s.trim())) return; // blank, the bare quote separator, or a rule
+  if (/^!\[[^\]]*\]\([^)]+\)\s*$/.test(s.trim())) { pictures++; pictureAt = i; afterMermaid = true; return; } // a rendered picture; the next italic line is its legend
   if (i === 0) return; // marker / series line
   text.push({ i, s });
 });
@@ -52,6 +53,8 @@ if (kcStart >= 0 && wlStart > kcStart) {
   });
 }
 if (mermaidAt >= 0 && kcStart >= 0 && mermaidAt > kcStart) fail.push("every picture must sit above **Key changes**");
+if (pictureAt >= 0 && kcStart >= 0 && pictureAt > kcStart) fail.push("every picture must sit above **Key changes**");
+if (pictures > 2) fail.push(`${pictures} rendered pictures; at most two — architecture and flow`);
 if (mermaidBlocks > 2) fail.push(`${mermaidBlocks} mermaid blocks; at most two — architecture and flow`);
 const archLine = lines.find((l) => /^\*\*Architecture:\*\*/.test(l.trim()));
 if (archLine && archLine.trim() === "**Architecture:**") fail.push("**Architecture:** is present but empty — fill it or delete it");
@@ -94,4 +97,5 @@ if (dOpen >= 0) {
 }
 
 if (fail.length) { fail.forEach((f) => console.log(`✗ ${f}`)); process.exit(1); }
-console.log(`ok — ${text.length} lines of text${mermaidBlocks === 1 ? ", one picture" : mermaidBlocks === 2 ? ", two pictures" : ""}`);
+const pics = mermaidBlocks + pictures;
+console.log(`ok — ${text.length} lines of text${pics === 1 ? ", one picture" : pics === 2 ? ", two pictures" : pics > 2 ? `, ${pics} pictures` : ""}`);

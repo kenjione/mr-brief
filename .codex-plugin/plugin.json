@@ -1,6 +1,6 @@
 {
   "name": "mr-brief",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Merge request descriptions a reviewer actually reads: fifteen lines, three key changes, three verified places to look, one risk, a diagram only when the wiring moved.",
   "author": {
     "name": "Alex Chernyshev",

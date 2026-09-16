@@ -51,7 +51,7 @@ self-review comment. Show the brief in the conversation first.
 | Series line | 1 line, only when the MR is one of a set |
 | What changes | 1 sentence, 140 chars |
 | Architecture | 1 line + the scenario as a sequence across services, only if a service now calls another it did not, or the MR is one of a set |
-| Flow | one mermaid block, above the key changes, only if the wiring moved |
+| Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there, else mermaid |
 | Key changes | `###` heading; exactly **3** bullets, `**claim** — reason`, most contentious first |
 | Where to look | `###` heading carrying `~N min` and `skip:`; exactly **3** permalinks as checkboxes, in reading order |
 | Risk | `###` heading; 1–2 lines, the only blockquote |
@@ -137,7 +137,11 @@ flow does not do that.
    node "${CLAUDE_PLUGIN_ROOT}/scripts/siblings.mjs" TICKET
    ```
    Two MRs from the same repo with the same title are a duplicate, not a series — say so.
-6. **Two picture gates, both default no.** *Architecture* — only if a service now
+6. **Two picture gates, both default no.** When a gate passes and `npx` is available,
+   write `tmp/mr-brief/graph.json` (see `reference/diagrams.md`, *Rendered*) and run
+   `render.mjs --mr <iid>`: it validates, draws both lenses with the PR Lens renderer and
+   uploads the SVGs; paste the image lines it prints above Key changes and move the mermaid
+   under `<details>` as the source. Without `npx`, or on GitHub, the mermaid is the picture. *Architecture* — only if a service now
    calls another it did not before, or the MR is one of a set; one line of text, then
    the scenario end to end as a sequence diagram, one lifeline per service, this repo's
    lifeline heavy. *Flow* — only if a

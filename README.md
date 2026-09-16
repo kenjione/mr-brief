@@ -96,7 +96,7 @@ Every link is a permalink that was checked against the commit before it was writ
 | **3** places to look | verified permalinks, caller before callee, with a minutes estimate and a `skip:` |
 | **1** risk line | worst realistic outcome, loud or silent, how to roll back |
 | **Architecture** | one line and one sequence across services — only when a service now calls one it did not |
-| **Diagram** | only when a call path, state machine, job or webhook moved; what is new marked |
+| **Diagram** | only when a call path, state machine, job or webhook moved; what is new marked — rendered SVG on GitLab, mermaid elsewhere |
 | **Reading guide** | under the fold: ≤ 8 files, each with one line and one hunk of ≤ 10 diff lines; renames are one line for all |
 | **Series line** | one line at the top when the MR is one of a set — the same in every MR of the set |
 
@@ -155,6 +155,7 @@ scripts/siblings.mjs              open MRs sharing the branch's ticket key (GitL
 scripts/focus.mjs                 sorts the diff into read-closely / skip, names the renames
 scripts/preview.mjs               the brief as the MR page will show it — platform renderer + mermaid, both themes
 scripts/excerpt.mjs               the decisive hunk of a file as a diff block, ten lines at most, for the reading guide
+scripts/render.mjs                draws both pictures with the PR Lens renderer and uploads them to the MR (GitLab)
 templates/                        the empty shape for GitLab and GitHub — usable with no agent at all
 ci/                               drop-in jobs that lint a description and comment, never block
 evals/                            lint fixtures, a real-run harness, a rubric
@@ -166,4 +167,4 @@ evals/                            lint fixtures, a real-run harness, a rubric
 
 Review effectiveness collapses past a few hundred changed lines; reviewers stop reading and start approving. A longer description does not fix that — it is the same failure one screen earlier. What moves review outcomes is a description that gets *finished*: short, ordered the way the code should be read, with nothing in it that a reviewer has to take on trust.
 
-MIT licensed.
+MIT licensed. Pictures are drawn with the [PR Lens](https://github.com/coldteadotai/pr-lens) renderer, also MIT.
