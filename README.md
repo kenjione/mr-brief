@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  A Claude Code skill that turns a diff into a fifteen-line brief: what changed, the three decisions worth arguing about, three verified places to look, one risk. A diagram only when the wiring moved. It asks before it writes, and never touches the MR without a second yes.
+  A Claude Code skill that turns a diff into a fifteen-line brief: what changed, the three decisions worth arguing about, three verified places to look, one risk. A diagram only when the wiring moved, and under the fold a reading guide: which eight files to open, what changed in each, the decisive hunk of every one. It asks before it writes, and never touches the MR without a second yes.
 </p>
 
 ## Install
@@ -63,24 +63,29 @@ sequenceDiagram … the scenario end to end, what is new marked in yellow
 > an add-on keeps billing after cancellation — visible as `last_error`, retried. Not silent.
 >
 > Rollback: flip the polling setting off.
+
+---
+▸ **Reading guide** — 3 files worth opening, with their hunks · what to skip · glossary
 ````
 
 Every link is a permalink that was checked against the commit before it was written. Every line is there because it removes reading: a picture instead of a paragraph, a link instead of a path, a bold claim instead of a sentence to parse, a `skip:` instead of forty files opened for nothing.
 
-## Preview before you attach
+## From diff to description
 
-`node scripts/preview.mjs tmp/mr-brief/brief.md` opens the brief rendered by GitLab's or
-GitHub's own Markdown API, with the mermaid drawn and a light/dark toggle. It is the last
-thing you see before the second yes, and it is what the reviewer will see.
-
-## The reading guide
-
-The description is the map; inside the diff the reviewer still meets forty files. So under
-`<details>` the brief carries a reading guide built from `focus.mjs`: for each file worth
-reading, one line — *what changed, what to check* — and the decisive hunk as a `diff` block,
-ten lines at most, cut by `excerpt.mjs` from the real diff. Then the files to skip and the
-files that only moved. The reviewer reads the code with its explanation, in one place,
-before opening a single file.
+1. **Sort the diff.** `focus.mjs` splits the changed files into core / tests / views /
+   config / generated and names the pure renames. On a 20-file MR that is typically 8 files
+   to read and 12 to skip — the `skip:` line is written from these counts, not by feel.
+2. **Write the brief** from the core diff: one sentence, the architecture line and its
+   sequence when a service now calls one it did not, three key changes, three verified
+   permalinks, one risk.
+3. **Add the reading guide** under the fold: for each core file, *what changed · what to
+   check* and its decisive hunk as a `diff` block — ten lines at most, cut by `excerpt.mjs`
+   from the real diff. Then the files to skip and the files that only moved. The reviewer
+   reads the code with its explanation in one place, before opening a single file.
+4. **Preview it** — `preview.mjs` renders the brief with GitLab's or GitHub's own Markdown
+   API, draws the mermaid, and toggles both themes. What you approve is what the reviewer
+   will see.
+5. **Attach** — only on your second yes.
 
 ## The rules
 
@@ -92,6 +97,8 @@ before opening a single file.
 | **1** risk line | worst realistic outcome, loud or silent, how to roll back |
 | **Architecture** | one line and one sequence across services — only when a service now calls one it did not |
 | **Diagram** | only when a call path, state machine, job or webhook moved; what is new marked |
+| **Reading guide** | under the fold: ≤ 8 files, each with one line and one hunk of ≤ 10 diff lines; renames are one line for all |
+| **Series line** | one line at the top when the MR is one of a set — the same in every MR of the set |
 
 If the change will not fit in three claims, the skill says so before writing: *split this, or the reviewer skims.*
 
