@@ -12,7 +12,8 @@
 
 import { readFileSync, mkdirSync, existsSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const OPENS_AN_MR = [
   /\b(?:mr|pr)\s+create\b/,                    // glab mr create, gh pr create, any wrapper
@@ -32,6 +33,23 @@ const OFFER =
   "  Want me to write an mr-brief for this MR? (15 lines, 3 places to look, diagram only if the wiring moved) — yes / no / show me the shape first\n\n" +
   "yes → run the mr-brief skill, then attach the result with --description-file (glab / gh) or your wrapper's file option.\n" +
   "no, or no answer → re-run the command exactly as it was. This hook will not interrupt this branch again.";
+
+// One line about a newer version, from the cache the SessionStart hook keeps. No network.
+function newer(a, b) {
+  const pa = String(a).split(".").map(Number), pb = String(b).split(".").map(Number);
+  for (let i = 0; i < 3; i++) { const d = (pa[i] || 0) - (pb[i] || 0); if (d) return d > 0; }
+  return false;
+}
+function updateNote() {
+  try {
+    const cfg = process.env.CLAUDE_CONFIG_DIR || join(process.env.HOME || "", ".claude");
+    const cache = JSON.parse(readFileSync(join(cfg, ".mr-brief-update.json"), "utf8"));
+    const installed = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", ".claude-plugin", "plugin.json"), "utf8")).version;
+    return newer(cache.latest, installed)
+      ? `\n\nAlso mention, once: mr-brief ${cache.latest} is out (installed ${installed}) — claude plugin update mr-brief@mr-brief`
+      : "";
+  } catch { return ""; }
+}
 
 function git(args, cwd) {
   return execFileSync("git", args, { cwd, stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
@@ -59,7 +77,7 @@ try {
   writeFileSync(marker, new Date().toISOString() + "\n");
 
   // Exit 2 stops this one tool call and hands stderr to Claude as the reason.
-  process.stderr.write(existsSync(ALWAYS_FLAG) ? ALWAYS : OFFER);
+  process.stderr.write((existsSync(ALWAYS_FLAG) ? ALWAYS : OFFER) + updateNote());
   process.exit(2);
 } catch {
   process.exit(0);

@@ -1,6 +1,6 @@
 {
   "name": "mr-brief",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Write merge/pull request descriptions a reviewer actually reads: 25 lines, three places to look, one diagram only when the wiring changed.",
   "author": {
     "name": "Alex Chernyshev",

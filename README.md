@@ -103,12 +103,29 @@ The skill is one Markdown file and the scripts are plain Node, so any agent that
 instructions can run it. Only Claude Code has the hook that offers the brief at the moment
 an MR is opened; elsewhere you ask for it.
 
+## Updates
+
+Claude Code does not check for plugin updates on its own — a plugin stays at the version
+it was installed at until you run `claude plugin update mr-brief@mr-brief`. So mr-brief
+checks for you: once a day, at session start, it reads the published `plugin.json` from
+this repository and, if the version is higher than yours, says so once:
+
+```
+mr-brief 0.4.0 is out (you have 0.3.2). Update: claude plugin update mr-brief@mr-brief
+```
+
+The check has a 1.5-second timeout and fails silently. It sends nothing but the request;
+GitHub sees your IP, as it does when you clone. To turn it off:
+`touch ~/.claude/.mr-brief-no-update-check`. What changed in each version is in
+[CHANGELOG.md](CHANGELOG.md).
+
 ## What ships
 
 ```
 skills/mr-brief/SKILL.md          the rules
 skills/mr-brief/reference/        how and when to draw
 hooks/offer.mjs                   the once-per-branch offer
+hooks/update-check.mjs            once a day, tells you when a newer version is published
 scripts/anchor.mjs                path:line → permalink, refuses a line that does not exist
 scripts/lint.mjs                  checks a brief against the contract
 scripts/siblings.mjs              open MRs sharing the branch's ticket key (GitLab)
