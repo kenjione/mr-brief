@@ -11,6 +11,7 @@ Repositories are private and not named here.
 | 2026-09-16 | same GitLab MR, sections as headings (v0.3.1) | 14 | 286s | $1.78 | ok, 14 lines | — |
 | 2026-09-16 | same MR, v0.3.2 rules, existing brief present | 8 | 168s | $0.85 | ok, 14 lines | — |
 | 2026-09-16 | same MR, v0.3.2 rules, `fresh` | 10 | 216s | $1.41 | ok, 13 lines | — |
+| 2026-09-16 | same MR, installed v0.4.0, existing brief present | 19 | 222s | $1.57 | ok, 14 lines | — |
 
 The GitHub run exercised the `github.com/…/blob/<sha>/…#L` permalink form and the
 `.mr-brief.md` fallback when `tmp/` is not ignored; on a docs-only branch it correctly drew
@@ -25,6 +26,13 @@ fact, `(external)`, grouped glossary, fails-with table) and got the substance wo
 dropped the verified nil-config defect and asserted that the ORM strips undeclared keys
 before the request — false; the gem posts the raw hash (`request.rb:92–105`). Same diff,
 same skill, different findings: a brief is one reading, and the author still reads it.
+
+The v0.4.0 run is the behaviour the rules were written for: it treated the brief already on
+the MR as input, re-verified every claim against the diff and the gem's source (all held),
+kept the fifteen visible lines unchanged, rewrote only `<details>` — glossary by role, a
+fails-with table — and added one new true fact: `usage_at` is set when the job runs, so an
+hour of retries reports an hour-late usage. It reported exactly what changed and asked
+separately before attaching and before posting comments.
 
 The GitLab runs each surfaced a real defect the description then had to carry — one a duplicate
 charge on a repeated write, one a configuration key read from the wrong place. That is what

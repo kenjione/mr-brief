@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+- `preview.mjs`: the brief rendered by the platform's own Markdown API with the mermaid drawn, light and dark — shown before the second yes.
+- `focus.mjs`: the diff sorted into core / tests / views / config / generated, renames named; the `skip:` clause and *Moved, not changed* come from it.
+
 ## 0.4.0
 - A SessionStart hook checks once a day whether a newer version is published and says so once. Opt out with `~/.claude/.mr-brief-no-update-check`.
 - The offer line mentions a pending update too, from the cache.

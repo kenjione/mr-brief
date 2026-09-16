@@ -85,6 +85,7 @@ sequenceDiagram ...       %% the scenario end to end; a translucent rect band on
 
 ### Risk
 > The worst realistic outcome, and whether it fails loudly or silently.
+>
 > Rollback: revert, or what else it takes.
 
 <details>
@@ -102,12 +103,15 @@ flow does not do that.
 
 ## Procedure
 
-1. **The real delta** — against the *remote* target, never the local copy:
+1. **The real delta** — against the *remote* target, never the local copy. Sort it first:
    ```bash
-   TARGET=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD | sed 's|origin/||')
-   git fetch origin "$TARGET" --quiet
-   git diff --stat "origin/$TARGET...HEAD" && git diff "origin/$TARGET...HEAD"
+   git fetch origin --quiet
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/focus.mjs"          # core / tests / views / config / generated, renames named
+   git diff origin/<target>...HEAD -- . ':!spec' …          # the core-only diff focus.mjs prints
    ```
+   Read the core files closely and the rest only as far as the brief needs. The `skip:`
+   clause is written from focus.mjs's counts, and pure renames go under `<details>` as
+   *Moved, not changed* — a reviewer should never read a moved file line by line.
 2. **Read the diff, not the commit messages.** Commits say what was meant; the brief
    says what the code now does. **An existing brief on the MR is input, not output.**
    If the description already carries the `<!-- mr-brief v1 -->` marker, re-derive every
@@ -146,7 +150,14 @@ flow does not do that.
    ```bash
    node "${CLAUDE_PLUGIN_ROOT}/scripts/lint.mjs" tmp/mr-brief/brief.md
    ```
-8. **Show it. Offer 2–3 self-review comments** (lines where you would pre-empt a
+8. **Preview it the way the MR will show it**, then show that:
+   ```bash
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/preview.mjs" tmp/mr-brief/brief.md
+   ```
+   The platform's own Markdown renderer draws the text (`glab api markdown` / `gh api
+   /markdown`), the page draws the mermaid, and a toggle shows both themes. Nobody says yes
+   to a description they have only seen as raw Markdown in a chat.
+9. **Offer 2–3 self-review comments** (lines where you would pre-empt a
    question). Attach only on a second yes:
    ```bash
    glab mr create --description-file tmp/mr-brief/brief.md      # gh pr create --body-file …
@@ -201,7 +212,8 @@ Write it the way you would say it to a colleague at their desk.
   heading: naming what *not* to read removes more work on a 70-file MR than any bullet adds.
 - **Risk** — worst *realistic* outcome; loud or silent; then revert-and-done or what more.
 - **`<details>`** — `<summary>` on its own line, blank line before and after the Markdown
-  inside, or it renders as raw text. Holds what a reviewer may want *after* starting.
+  inside, or it renders as raw text. In the risk blockquote a bare `>` line separates the risk from the
+  rollback — consecutive `>` lines fold into one paragraph otherwise. Holds what a reviewer may want *after* starting.
   Two things earn their place there: a **glossary grouped by role** — *Entry · Boundary ·
   Deciding · Errors* — one line per part; and, when the MR adds refusal or error paths, a
   **fails-with table**: `| outcome | error the caller sees | reached when |`, one row per

@@ -61,10 +61,17 @@ sequenceDiagram … the scenario end to end, what is new marked in yellow
 
 ### Risk
 > an add-on keeps billing after cancellation — visible as `last_error`, retried. Not silent.
+>
 > Rollback: flip the polling setting off.
 ````
 
 Every link is a permalink that was checked against the commit before it was written. Every line is there because it removes reading: a picture instead of a paragraph, a link instead of a path, a bold claim instead of a sentence to parse, a `skip:` instead of forty files opened for nothing.
+
+## Preview before you attach
+
+`node scripts/preview.mjs tmp/mr-brief/brief.md` opens the brief rendered by GitLab's or
+GitHub's own Markdown API, with the mermaid drawn and a light/dark toggle. It is the last
+thing you see before the second yes, and it is what the reviewer will see.
 
 ## The rules
 
@@ -129,6 +136,8 @@ hooks/update-check.mjs            once a day, tells you when a newer version is 
 scripts/anchor.mjs                path:line → permalink, refuses a line that does not exist
 scripts/lint.mjs                  checks a brief against the contract
 scripts/siblings.mjs              open MRs sharing the branch's ticket key (GitLab)
+scripts/focus.mjs                 sorts the diff into read-closely / skip, names the renames
+scripts/preview.mjs               the brief as the MR page will show it — platform renderer + mermaid, both themes
 templates/                        the empty shape for GitLab and GitHub — usable with no agent at all
 ci/                               drop-in jobs that lint a description and comment, never block
 evals/                            lint fixtures, a real-run harness, a rubric

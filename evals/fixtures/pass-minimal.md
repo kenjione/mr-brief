@@ -14,4 +14,5 @@ Deactivated subscriptions no longer come back from the lookup the payments servi
 
 ### Risk
 > a charge that used to find a dead subscription now finds none and is refused. Loudly.
+>
 > Rollback: revert. No migration.

@@ -27,6 +27,7 @@
 
 ### Risk
 > The worst realistic outcome — does it fail loudly or silently?
+>
 > Rollback: revert, or what else it takes.
 
 <details>

@@ -25,7 +25,7 @@ lines.forEach((raw, i) => {
   if (afterMermaid) { afterMermaid = false; if (/^[*_].*[*_]\s*$/.test(s.trim())) return; } // legend
   if (/^<details>/.test(s.trim())) { inDetails = true; return; }
   if (inDetails) { if (/^<\/details>/.test(s.trim())) inDetails = false; return; }
-  if (s.trim() === "") return;
+  if (s.trim() === "" || s.trim() === ">") return; // blank, or the bare quote line that separates two quote paragraphs
   if (i === 0) return; // marker / series line
   text.push({ i, s });
 });

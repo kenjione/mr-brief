@@ -36,6 +36,7 @@ sequenceDiagram
 
 ### Risk
 > an add-on keeps billing after its subscription was cancelled — visible as `last_error` on the row and retried next sweep, not silent.
+>
 > Rollback: flip `billing.subscription_polling_enabled` to false; a full revert also needs the diagnostics migration rolled back.
 
 <details>
