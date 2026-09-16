@@ -23,6 +23,17 @@ this MR sits in it* — and every developer reads it without a legend.
 - 8–12 messages: the calls between services, plus a self-message where a service makes a
   decision that matters (`replayed? → whole family dies`). Nothing internal beyond that.
 - Replies dashed. Refusals named on the reply (`charge — or refuse, reason named`).
+- **Label a message with the real call when it is short** — `evaluate(chain:)`,
+  `find_pinned(pseudonym:)`. It ties the arrow to a line of code the way `file.rb:163` ties
+  a node to one. Over ~30 characters, say what it does instead.
+- **Mark what is not ours.** A third-party library or another team's service is the part
+  the reviewer cannot change. In a sequence, put `(library)` or `(external)` in the alias;
+  in a flowchart, wrap it in a `subgraph` with a dashed frame:
+  `style Lib stroke-dasharray: 5 4,stroke:#8A8F88`. Then the legend can say *everything
+  outside the dashed frame is ours*.
+- **A callback is a labelled return, not a second call.** When the callee calls back up
+  (`isValid(chain:) → Bool`), draw it as a dashed reply carrying the method name. An arrow
+  that runs against the reading direction without that label reads as a layering mistake.
 - In a **series**, this one picture is drawn for the whole set and repeated in every MR,
   identical apart from the heavy lifeline — and the `rect` band, which moves to the
   messages *this* MR adds. Wherever the reviewer lands, they see the whole
@@ -62,7 +73,26 @@ sequenceDiagram
 | Who calls whom, in what order | `sequenceDiagram` |
 | A lifecycle: states and transitions | `stateDiagram-v2` |
 | Checks or steps whose *position* in a flow is the change | `flowchart TD` |
+| Ordered checks where the **first match wins** | a numbered ladder — a 3-row table, not diamonds |
 | Nothing above | no diagram |
+
+## The ladder: first match wins
+
+A classifier, a chain of guards, a precedence order — anything where the rungs are tried
+in order and the first that matches decides — is clearer as a numbered ladder than as a
+flowchart of diamonds. It is also plain Markdown, so it renders everywhere:
+
+```markdown
+| # | when | result |
+|---|---|---|
+| 1 | the previous credential was revoked for a reason not on the allowlist | refuse |
+| 2 | the purchase is dead or blocked | refuse |
+| 3 | a required attribute is gone from the profile | refuse |
+| — | nothing matched | issue |
+```
+
+If the ladder *is* the headline change, it stands where the flow diagram would and counts
+as text — four or five lines. Otherwise it goes under `<details>`.
 
 ## Draw the change, not the system
 
@@ -106,8 +136,14 @@ flowchart TD
     class X stop
 ```
 
-Then one short italic line under the block — *Yellow: added by this MR.* It belongs to
-the diagram and does not count against the text limit.
+Then one short italic line under the block. It starts with the colour key and ends with
+**the one non-obvious fact the picture cannot say by itself**:
+
+*Yellow: added by this MR. The flag is read once, at the top — passing nil is the whole
+off-switch.*
+
+The legend belongs to the diagram and does not count against the text limit. A legend that
+only decodes colours is a wasted line.
 
 - Give **every** node a class. Mermaid's default lilac boxes are what makes a diagram look
   unconsidered, and an explicit fill is the only styling that survives GitLab.

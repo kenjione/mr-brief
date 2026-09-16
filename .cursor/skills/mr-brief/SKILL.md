@@ -71,7 +71,7 @@ One sentence saying what is now true that was not before.
 ```mermaid
 sequenceDiagram ...       %% the scenario end to end; a translucent rect band on what this MR adds
 ```
-*Yellow: added by this MR.*
+*Yellow: added by this MR. One sentence on the fact the picture cannot say by itself.*
 
 ### Key changes
 - **The claim in bold** — the reason, after the dash
@@ -109,7 +109,13 @@ flow does not do that.
    git diff --stat "origin/$TARGET...HEAD" && git diff "origin/$TARGET...HEAD"
    ```
 2. **Read the diff, not the commit messages.** Commits say what was meant; the brief
-   says what the code now does.
+   says what the code now does. **An existing brief on the MR is input, not output.**
+   If the description already carries the `<!-- mr-brief v1 -->` marker, re-derive every
+   section from the diff anyway, then keep only what still holds — and tell the author
+   what changed between the two. Never re-emit the old text because it is there.
+   The risk it names is a hypothesis to re-verify against the code, never something to
+   drop because the new draft did not happen to find it. `/mr-brief fresh` means: do not
+   read the existing description at all — use it only to test the skill itself.
 3. **Size check** — three claims, or say so.
 4. **Anchors** — never type a `path:line` by hand. The script verifies the line exists
    and builds the permalink:
@@ -165,6 +171,10 @@ Write it the way you would say it to a colleague at their desk.
   is the author's shorthand.
 - **Active voice, present tense.** "The sweep skips", not "will be skipped".
 - **No claim the diff does not contain.** No "faster" without a number.
+- **A claim about what a library or framework does is read in its source, not remembered.**
+  "The ORM drops unknown keys", "the client raises on 4xx" — open the gem and point at the
+  line, or leave the claim out. A confident wrong sentence about a dependency is the most
+  expensive thing a brief can carry, because nobody checks it.
 - **Bold the claim, not the topic.** Someone reading only the bold still understands the MR.
 - **Banned openers**: `This MR/PR …`, `In this change …`, `As part of …`, `Refactored …`,
   `Various improvements …`, `Minor fixes …`, `Added …`, `Updated …`.
@@ -192,6 +202,10 @@ Write it the way you would say it to a colleague at their desk.
 - **Risk** — worst *realistic* outcome; loud or silent; then revert-and-done or what more.
 - **`<details>`** — `<summary>` on its own line, blank line before and after the Markdown
   inside, or it renders as raw text. Holds what a reviewer may want *after* starting.
+  Two things earn their place there: a **glossary grouped by role** — *Entry · Boundary ·
+  Deciding · Errors* — one line per part; and, when the MR adds refusal or error paths, a
+  **fails-with table**: `| outcome | error the caller sees | reached when |`, one row per
+  outcome. Say in the row whether it is loud or silent.
 - **No emoji headings**, no decorative rules, no `🚀 Summary`.
 
 ## Before handing over
