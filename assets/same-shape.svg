@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="340" viewBox="0 0 900 340" role="img" aria-label="Three merge request briefs with the same four blocks: a one-line summary, key changes, where to look, risk.">
+<rect x="20" y="20" width="260" height="300" rx="14" fill="#1C1C1E" stroke="#2C2C2E"/>
+<rect x="38" y="38" width="224" height="10" rx="3" fill="#E5E5EA"/>
+<rect x="38" y="62" width="224" height="44" rx="4" fill="#2C2C2E" stroke="#48484A" stroke-dasharray="4 3"/>
+<line x1="38" y1="116" x2="262" y2="116" stroke="#48484A"/>
+<text x="38" y="132" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">KEY CHANGES</text>
+<rect x="38" y="142" width="224" height="6" rx="3" fill="#3A3A3C"/>
+<rect x="38" y="153" width="192.64" height="6" rx="3" fill="#3A3A3C"/>
+<rect x="38" y="164" width="208.32000000000002" height="6" rx="3" fill="#3A3A3C"/>
+<line x1="38" y1="181" x2="262" y2="181" stroke="#48484A"/>
+<text x="38" y="197" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">WHERE TO LOOK</text>
+<rect x="38" y="207" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<rect x="38" y="218" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<rect x="38" y="229" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<line x1="38" y1="246" x2="262" y2="246" stroke="#48484A"/>
+<text x="38" y="262" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">RISK</text>
+<rect x="38" y="272" width="224" height="8" rx="3" fill="#F2DC5D"/>
+<rect x="320" y="20" width="260" height="246" rx="14" fill="#1C1C1E" stroke="#2C2C2E"/>
+<rect x="338" y="38" width="224" height="10" rx="3" fill="#E5E5EA"/>
+<line x1="338" y1="62" x2="562" y2="62" stroke="#48484A"/>
+<text x="338" y="78" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">KEY CHANGES</text>
+<rect x="338" y="88" width="224" height="6" rx="3" fill="#3A3A3C"/>
+<rect x="338" y="99" width="192.64" height="6" rx="3" fill="#3A3A3C"/>
+<rect x="338" y="110" width="208.32000000000002" height="6" rx="3" fill="#3A3A3C"/>
+<line x1="338" y1="127" x2="562" y2="127" stroke="#48484A"/>
+<text x="338" y="143" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">WHERE TO LOOK</text>
+<rect x="338" y="153" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<rect x="338" y="164" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<rect x="338" y="175" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<line x1="338" y1="192" x2="562" y2="192" stroke="#48484A"/>
+<text x="338" y="208" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">RISK</text>
+<rect x="338" y="218" width="224" height="8" rx="3" fill="#F2DC5D"/>
+<rect x="620" y="20" width="260" height="300" rx="14" fill="#1C1C1E" stroke="#2C2C2E"/>
+<rect x="638" y="38" width="224" height="10" rx="3" fill="#E5E5EA"/>
+<rect x="638" y="62" width="224" height="44" rx="4" fill="#2C2C2E" stroke="#48484A" stroke-dasharray="4 3"/>
+<line x1="638" y1="116" x2="862" y2="116" stroke="#48484A"/>
+<text x="638" y="132" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">KEY CHANGES</text>
+<rect x="638" y="142" width="224" height="6" rx="3" fill="#3A3A3C"/>
+<rect x="638" y="153" width="192.64" height="6" rx="3" fill="#3A3A3C"/>
+<rect x="638" y="164" width="208.32000000000002" height="6" rx="3" fill="#3A3A3C"/>
+<line x1="638" y1="181" x2="862" y2="181" stroke="#48484A"/>
+<text x="638" y="197" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">WHERE TO LOOK</text>
+<rect x="638" y="207" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<rect x="638" y="218" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<rect x="638" y="229" width="161.28" height="6" rx="3" fill="#8E8E93"/>
+<line x1="638" y1="246" x2="862" y2="246" stroke="#48484A"/>
+<text x="638" y="262" font-family="-apple-system, system-ui, Segoe UI, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1.6" fill="#F5F5F7">RISK</text>
+<rect x="638" y="272" width="224" height="8" rx="3" fill="#F2DC5D"/>
+</svg>

@@ -52,9 +52,9 @@ self-review comment. Show the brief in the conversation first.
 | What changes | 1 sentence, 140 chars |
 | Architecture | 1 line + the scenario as a sequence across services, only if a service now calls another it did not, or the MR is one of a set |
 | Flow | one mermaid block, above the key changes, only if the wiring moved |
-| Key changes | exactly **3** bullets, `**claim** — reason`, most contentious first |
-| Where to look | exactly **3** permalinks as checkboxes, in reading order |
-| Risk | 1–2 lines, the only blockquote |
+| Key changes | `###` heading; exactly **3** bullets, `**claim** — reason`, most contentious first |
+| Where to look | `###` heading carrying `~N min` and `skip:`; exactly **3** permalinks as checkboxes, in reading order |
+| Risk | `###` heading; 1–2 lines, the only blockquote |
 
 If the change does not fit in three claims, say so before writing: *"this is N separable
 changes — split it, or the reviewer skims."* Write it if they decline, but say it once.
@@ -66,28 +66,25 @@ changes — split it, or the reviewer skims."* Write it if they decline, but say
 
 One sentence saying what is now true that was not before.
 
-**Architecture:** one line on what the system's shape gained, lost or moved. Then its picture.
+**Architecture:** one line on what now talks to what that did not before. Then its picture.
 
 ```mermaid
 sequenceDiagram ...       %% the scenario end to end; a translucent rect band on what this MR adds
 ```
-
-```mermaid
-flowchart TD ...          %% the flow, if the wiring moved
-```
 *Yellow: added by this MR.*
 
-**Key changes**
+### Key changes
 - **The claim in bold** — the reason, after the dash
 - **The next claim** — its reason
 - **The third** — its reason
 
-**Where to look** · ~12 min · skip the 890 lines of specs
+### Where to look · ~12 min · skip the 890 lines of specs
 - [ ] **Start →** [file.rb:21](permalink#L21) — the entry point, top to bottom
 - [ ] [other.rb:103](permalink#L103) — the decision most worth arguing about
 - [ ] [spec.rb:92](permalink#L92) — the test that proves the interesting case
 
-> **Risk:** the worst realistic outcome, and whether it fails loudly or silently.
+### Risk
+> The worst realistic outcome, and whether it fails loudly or silently.
 > Rollback: revert, or what else it takes.
 
 <details>
@@ -97,6 +94,11 @@ Everything true but not needed to start reviewing. Never the diagram.
 
 </details>
 ```
+
+Sections are `###` headings, not bold lines. Both renderers give a heading its own space
+and weight, so the four blocks read as four blocks — a reviewer who has seen one brief
+knows where the risk is in the next before it has finished loading. Bold text in the
+flow does not do that.
 
 ## Procedure
 

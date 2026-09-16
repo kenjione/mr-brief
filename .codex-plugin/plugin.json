@@ -1,12 +1,23 @@
 {
   "name": "mr-brief",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Merge request descriptions a reviewer actually reads: fifteen lines, three key changes, three verified places to look, one risk, a diagram only when the wiring moved.",
-  "author": { "name": "Alex Chernyshev", "url": "https://github.com/kenjione" },
+  "author": {
+    "name": "Alex Chernyshev",
+    "url": "https://github.com/kenjione"
+  },
   "homepage": "https://github.com/kenjione/mr-brief",
   "repository": "https://github.com/kenjione/mr-brief",
   "license": "MIT",
-  "keywords": ["code-review", "merge-request", "pull-request", "gitlab", "github", "skills", "codex"],
+  "keywords": [
+    "code-review",
+    "merge-request",
+    "pull-request",
+    "gitlab",
+    "github",
+    "skills",
+    "codex"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "mr brief",
@@ -14,7 +25,9 @@
     "longDescription": "Turns a branch diff into a fifteen-line brief: what changed, the three decisions worth arguing about, three permalinks verified against the commit, one risk line, and a sequence diagram only when a call path moved. Asks before writing; never attaches without a second yes.",
     "developerName": "Alex Chernyshev",
     "category": "Productivity",
-    "capabilities": ["Instructions"],
+    "capabilities": [
+      "Instructions"
+    ],
     "websiteURL": "https://github.com/kenjione/mr-brief",
     "defaultPrompt": [
       "Write an mr-brief for this branch.",

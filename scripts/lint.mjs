@@ -40,10 +40,10 @@ const banned = /^(this (mr|pr|change|commit)\b|in this (change|mr|pr)\b|as part 
 if (banned.test(lead)) fail.push(`opening sentence starts with a banned opener: "${lead.split(/\s+/).slice(0, 3).join(" ")}…"`);
 
 // ---- key changes: exactly 3 bold-claim bullets between the two headings
-const kcStart = lines.findIndex((l) => /^\*\*Key changes\*\*/.test(l.trim()));
-const wlStart = lines.findIndex((l) => /^\*\*Where to look\*\*/.test(l.trim()));
-if (kcStart < 0) fail.push("missing **Key changes** heading");
-if (wlStart < 0) fail.push("missing **Where to look** heading");
+const kcStart = lines.findIndex((l) => /^(###\s+|\*\*)Key changes(\*\*)?/.test(l.trim()));
+const wlStart = lines.findIndex((l) => /^(###\s+|\*\*)Where to look(\*\*)?/.test(l.trim()));
+if (kcStart < 0) fail.push("missing ### Key changes heading");
+if (wlStart < 0) fail.push("missing ### Where to look heading");
 if (kcStart >= 0 && wlStart > kcStart) {
   const bullets = lines.slice(kcStart + 1, wlStart).filter((l) => /^- /.test(l.trim()));
   if (bullets.length !== 3) fail.push(`${bullets.length} key changes; there must be exactly 3`);
@@ -66,14 +66,17 @@ boxes.forEach((b, n) => {
   if (links > 1) fail.push(`where-to-look ${n + 1} carries ${links} links; one place per entry`);
 });
 if (boxes[0] && !/\*\*Start →\*\*/.test(boxes[0])) fail.push('first where-to-look entry must begin with **Start →**');
-if (wlStart >= 0 && !/~\d+\s*min/.test(lines[wlStart])) fail.push("**Where to look** heading needs a minutes estimate (~N min)");
+if (wlStart >= 0 && !/~\d+\s*min/.test(lines[wlStart])) fail.push("### Where to look heading needs a minutes estimate (~N min)");
 
 // ---- risk: exactly one blockquote group, carrying **Risk
 const quoteGroups = [];
 let inQ = false;
 lines.forEach((l) => { const q = /^>/.test(l.trim()); if (q && !inQ) quoteGroups.push(l); inQ = q; });
 if (quoteGroups.length !== 1) fail.push(`${quoteGroups.length} blockquotes; exactly one, on the risk`);
-if (!lines.some((l) => /^>\s*\*\*Risk/.test(l.trim()))) fail.push("blockquote must start with **Risk:**");
+const riskHead = lines.findIndex((l) => /^###\s+Risk\b/.test(l.trim()));
+const riskQuoteOld = lines.some((l) => /^>\s*\*\*Risk/.test(l.trim()));
+if (riskHead < 0 && !riskQuoteOld) fail.push("missing ### Risk heading above the blockquote");
+if (riskHead >= 0 && !/^>/.test((lines[riskHead + 1] ?? "").trim())) fail.push("### Risk must be followed directly by the blockquote");
 
 // ---- headings: no emoji
 const emoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u;

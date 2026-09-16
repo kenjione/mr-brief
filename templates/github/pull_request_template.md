@@ -11,21 +11,22 @@
      call between services, a state machine, a job, a webhook, or an order of operations
      that is the point. Otherwise delete this comment and draw nothing. -->
 
-**Key changes**
+### Key changes
 <!-- Exactly 3 bullets. Bold the claim, put the reason after the dash. Each one a
      decision someone could disagree with, most contentious first. -->
 - **** —
 - **** —
 - **** —
 
-**Where to look** · ~N min · skip:
+### Where to look · ~N min · skip:
 <!-- Three permalinks, in reading order, starting at the entry point.
      Permalink form: <mr-url-base>/-/blob/<head-sha>/<path>#L<line> -->
 - [ ] **Start →** [file.rb:00](#) —
 - [ ] [file.rb:00](#) —
 - [ ] [spec.rb:00](#) —
 
-> **Risk:** the worst realistic outcome — does it fail loudly or silently?
+### Risk
+> The worst realistic outcome — does it fail loudly or silently?
 > Rollback: revert, or what else it takes.
 
 <details>

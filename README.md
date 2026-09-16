@@ -30,6 +30,12 @@ Or paste this into Claude Code and let it do the install: *Install the mr-brief 
 
 Or just open the MR as usual — `glab mr create`, `gh pr create` — and mr-brief offers itself once, in one line. Say no and it stays quiet for that branch. Works with GitLab and GitHub.
 
+## Same shape, every MR
+
+<p align="center"><img src="assets/same-shape.svg" alt="three briefs with the same four blocks" width="900"></p>
+
+The same four blocks, in the same order, with a line between them. Reviewers learn the layout once and know where the risk line is before the page loads. That is the whole idea; everything else is enforcement.
+
 ## What you get
 
 ````markdown
@@ -43,17 +49,18 @@ Cancelling a subscription now also cancels every add-on billed against it.
 sequenceDiagram … the scenario end to end, what is new marked in yellow
 ```
 
-**Key changes**
+### Key changes
 - **Cancelled state is re-read from the provider every sweep** — a stale copy cannot keep an add-on billing
 - **The sweep is fail-soft per subscription** — one unreachable provider no longer aborts the rest
 - **A 404 from the cancel call counts as success** — no add-ons, still cancelled
 
-**Where to look** · ~8 min · skip the 300 lines of specs
+### Where to look · ~8 min · skip the 300 lines of specs
 - [ ] **Start →** [poll_subscriptions_worker.rb:45](…#L45) — where a cancelled flag becomes a cascade
 - [ ] [addon_cancellation.rb:21](…#L21) — 404 swallowed into false; the arguable bit
 - [ ] [poll_subscriptions_worker_spec.rb:92](…#L92) — proves a failing cascade does not stop the sweep
 
-> **Risk:** an add-on keeps billing after cancellation — visible as `last_error`, retried. Not silent.
+### Risk
+> an add-on keeps billing after cancellation — visible as `last_error`, retried. Not silent.
 > Rollback: flip the polling setting off.
 ````
 
