@@ -88,8 +88,10 @@ sequenceDiagram ...       %% the scenario end to end; a translucent rect band on
 >
 > Rollback: revert, or what else it takes.
 
+---
+
 <details>
-<summary>Details</summary>
+<summary><strong>Reading guide</strong> — 8 files worth opening, with their hunks · what to skip · glossary</summary>
 
 Everything true but not needed to start reviewing. Never the diagram.
 
@@ -157,8 +159,32 @@ flow does not do that.
    The platform's own Markdown renderer draws the text (`glab api markdown` / `gh api
    /markdown`), the page draws the mermaid, and a toggle shows both themes. Nobody says yes
    to a description they have only seen as raw Markdown in a chat.
-9. **Offer 2–3 self-review comments** (lines where you would pre-empt a
-   question). Attach only on a second yes:
+9. **Add the reading guide under `<details>`** — the diff made edible without leaving the
+   description. For each core file from `focus.mjs` (eight at most): one line — *what
+   changed · what to check* — with the file as a permalink, then the **decisive hunk** as a
+   ```` ```diff ```` block cut by the script, never by hand and never a whole file:
+   ```bash
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/excerpt.mjs" app/x.rb:42 lib/y.rb:7 --sha <head> --lines 10
+   ```
+   ```markdown
+   **Reading guide**
+
+   **[worker.rb:22](permalink)** — posts the usage after five guards · the reply is never read, so a 422 is a silent loss
+   `app/workers/worker.rb:15–24` @ 1bbdfe2
+   ```diff
+   +    return unless product_code.present?
+   +
+   +    InvoiceManager::BillableUsage.create(
+   ```
+
+   Skip: 7 spec files (they all stub `.create`), 2 admin views, `schema.rb`.
+   Moved, not changed: `a.rb → b.rb`.
+   ```
+   *What changed* is the decision, not a restatement; *what to check* is the trap or the
+   question a reviewer cannot see from the hunk alone. Ten diff lines per file at most;
+   plumbing files get the one line and no hunk. Pure renames are one line, never an entry.
+   The `@ sha` says which revision the hunk shows — after a new push, re-run the brief.
+10. **Attach** — only on a second yes:
    ```bash
    glab mr create --description-file tmp/mr-brief/brief.md      # gh pr create --body-file …
    ```
@@ -212,7 +238,10 @@ Write it the way you would say it to a colleague at their desk.
   heading: naming what *not* to read removes more work on a 70-file MR than any bullet adds.
 - **Risk** — worst *realistic* outcome; loud or silent; then revert-and-done or what more.
 - **`<details>`** — `<summary>` on its own line, blank line before and after the Markdown
-  inside, or it renders as raw text. In the risk blockquote a bare `>` line separates the risk from the
+  inside, or it renders as raw text. A bare `Details` summary renders as a footnote nobody
+  opens: put a `---` rule above the block and make the summary **say what is inside** —
+  `<strong>Reading guide</strong> — 8 files with their hunks · what to skip · glossary`.
+  `<strong>` survives both sanitizers; the rule and the summary count as no text lines. In the risk blockquote a bare `>` line separates the risk from the
   rollback — consecutive `>` lines fold into one paragraph otherwise. Holds what a reviewer may want *after* starting.
   Two things earn their place there: a **glossary grouped by role** — *Entry · Boundary ·
   Deciding · Errors* — one line per part; and, when the MR adds refusal or error paths, a
@@ -230,4 +259,4 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] The first anchor is the caller, not something it calls
 - [ ] Each picture passes its gate and is drawn at the level of the headline change
 - [ ] Every arrow in it exists in the code
-- [ ] Nothing was attached without a second yes
+- [ ] Nothing was attached without a second yes; the reading guide covers each core file once, hunks cut by `excerpt.mjs`, none for a rename

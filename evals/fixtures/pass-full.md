@@ -39,8 +39,10 @@ sequenceDiagram
 >
 > Rollback: flip `billing.subscription_polling_enabled` to false; a full revert also needs the diagnostics migration rolled back.
 
+---
+
 <details>
-<summary>Scope, settings and tests</summary>
+<summary><strong>Reading guide</strong> — the sweep worker's hunk · what to skip · settings and tests</summary>
 
 - Settings in `config/settings.yml`; schedule in `config/sidekiq.yml` (low-priority queue, every 12-24h)
 - Migration adds `last_attempt_at` and `last_error` to `subscriptions`

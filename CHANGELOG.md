@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.0
+- The reading guide under `<details>`: for each core file, what changed · what to check, and its decisive hunk as a `diff` block cut by `excerpt.mjs` — ten lines at most. Then skip and moved-not-changed. The diff made edible without leaving the description.
+
 ## 0.5.0
 - `preview.mjs`: the brief rendered by the platform's own Markdown API with the mermaid drawn, light and dark — shown before the second yes.
 - `focus.mjs`: the diff sorted into core / tests / views / config / generated, renames named; the `skip:` clause and *Moved, not changed* come from it.

@@ -73,6 +73,15 @@ Every link is a permalink that was checked against the commit before it was writ
 GitHub's own Markdown API, with the mermaid drawn and a light/dark toggle. It is the last
 thing you see before the second yes, and it is what the reviewer will see.
 
+## The reading guide
+
+The description is the map; inside the diff the reviewer still meets forty files. So under
+`<details>` the brief carries a reading guide built from `focus.mjs`: for each file worth
+reading, one line — *what changed, what to check* — and the decisive hunk as a `diff` block,
+ten lines at most, cut by `excerpt.mjs` from the real diff. Then the files to skip and the
+files that only moved. The reviewer reads the code with its explanation, in one place,
+before opening a single file.
+
 ## The rules
 
 | | |
@@ -138,6 +147,7 @@ scripts/lint.mjs                  checks a brief against the contract
 scripts/siblings.mjs              open MRs sharing the branch's ticket key (GitLab)
 scripts/focus.mjs                 sorts the diff into read-closely / skip, names the renames
 scripts/preview.mjs               the brief as the MR page will show it — platform renderer + mermaid, both themes
+scripts/excerpt.mjs               the decisive hunk of a file as a diff block, ten lines at most, for the reading guide
 templates/                        the empty shape for GitLab and GitHub — usable with no agent at all
 ci/                               drop-in jobs that lint a description and comment, never block
 evals/                            lint fixtures, a real-run harness, a rubric

@@ -25,7 +25,7 @@ lines.forEach((raw, i) => {
   if (afterMermaid) { afterMermaid = false; if (/^[*_].*[*_]\s*$/.test(s.trim())) return; } // legend
   if (/^<details>/.test(s.trim())) { inDetails = true; return; }
   if (inDetails) { if (/^<\/details>/.test(s.trim())) inDetails = false; return; }
-  if (s.trim() === "" || s.trim() === ">") return; // blank, or the bare quote line that separates two quote paragraphs
+  if (s.trim() === "" || s.trim() === ">" || /^-{3,}$/.test(s.trim())) return; // blank, the bare quote separator, or a rule
   if (i === 0) return; // marker / series line
   text.push({ i, s });
 });
@@ -87,6 +87,7 @@ const dOpen = lines.findIndex((l) => /^<details\b/.test(l.trim()));
 if (dOpen >= 0) {
   const sameLine = lines[dOpen].trim() !== "<details>";
   if (sameLine || !/^<summary>.*<\/summary>$/.test((lines[dOpen + 1] ?? "").trim())) fail.push("<summary> must be on its own line right after <details>");
+  if (/^<summary>\s*(details|more|notes?)\s*<\/summary>$/i.test((lines[dOpen + 1] ?? "").trim())) fail.push("<summary> is a bare word — say what is inside (e.g. <strong>Reading guide</strong> — 8 files …)");
   if ((lines[dOpen + 2] ?? "x").trim() !== "") fail.push("blank line required after <summary>");
   const dClose = lines.findIndex((l, i) => i > dOpen && l.trim() === "</details>");
   if (dClose > 0 && (lines[dClose - 1] ?? "x").trim() !== "") fail.push("blank line required before </details>");

@@ -30,8 +30,10 @@
 >
 > Rollback: revert, or what else it takes.
 
+---
+
 <details>
-<summary>Details</summary>
+<summary><strong>Reading guide</strong> — N files worth opening, with their hunks · what to skip · glossary</summary>
 
 <!-- Everything true but not needed to start reviewing. Never the diagram. -->
 

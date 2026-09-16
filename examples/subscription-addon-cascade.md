@@ -39,8 +39,28 @@ sequenceDiagram
 >
 > Rollback: flip `billing.subscription_polling_enabled` to false; a full revert also needs the diagnostics migration rolled back.
 
+---
+
 <details>
-<summary>Scope, settings and tests</summary>
+<summary><strong>Reading guide</strong> — the sweep worker's hunk · what to skip · settings and tests</summary>
+
+**Reading guide**
+
+**[poll_subscriptions_worker.rb:45](https://gitlab.example.com/billing/core/-/blob/3f9c2a7d1e04b6c8a5f0d2e9b7c1a4f6e8d0b2c3/app/workers/billing/poll_subscriptions_worker.rb#L45)** — one sweep per subscription, fail-soft · a failure keeps the row active and retries next run, so nothing is ever lost quietly
+`app/workers/billing/poll_subscriptions_worker.rb:41–48` @ 3f9c2a7
+
+```diff
++      state = provider.fetch_state(subscription.external_id)
++      cancelled = state.cancelled?
++
++      cancel_addons!(subscription) if cancelled
++      subscription.update!(last_checked_at: now, last_error: nil)
++    rescue => e
++      record_failure(subscription, e)
+```
+
+Skip: 300 lines of specs, the migration.
+Moved, not changed: none.
 
 - Settings in `config/settings.yml`; schedule in `config/sidekiq.yml` (low-priority queue, every 12-24h)
 - Migration adds `last_attempt_at` and `last_error` to `subscriptions`
