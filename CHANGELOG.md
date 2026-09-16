@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.2
+- Pictures are rebuilt on every run. An earlier brief's claims are re-verified and kept; its diagram is stale output and is replaced with what this version draws.
+
 ## 0.7.1
 - The skill writes the description and nothing else: no comments, threads or review notes on the MR, ever. The per-file guidance lives in the reading guide.
 

@@ -122,7 +122,10 @@ flow does not do that.
    section from the diff anyway, then keep only what still holds — and tell the author
    what changed between the two. Never re-emit the old text because it is there.
    The risk it names is a hypothesis to re-verify against the code, never something to
-   drop because the new draft did not happen to find it. `/mr-brief fresh` means: do not
+   drop because the new draft did not happen to find it. **Pictures are the exception:
+   they are rebuilt every run**, with whatever this version draws — an old mermaid block
+   is not "still holding", it is stale output. If `npx` is there, render and replace it;
+   the old block moves under `<details>` as source or goes. `/mr-brief fresh` means: do not
    read the existing description at all — use it only to test the skill itself.
 3. **Size check** — three claims, or say so.
 4. **Anchors** — never type a `path:line` by hand. The script verifies the line exists
@@ -139,7 +142,8 @@ flow does not do that.
    node "${CLAUDE_PLUGIN_ROOT}/scripts/siblings.mjs" TICKET
    ```
    Two MRs from the same repo with the same title are a duplicate, not a series — say so.
-6. **Two picture gates, both default no.** When a gate passes and `npx` is available,
+6. **Two picture gates, both default no.** Pictures are regenerated on every run, never
+   carried over from an earlier brief. When a gate passes and `npx` is available,
    write `tmp/mr-brief/graph.json` (see `reference/diagrams.md`, *Rendered*) and run
    `render.mjs --mr <iid>`: it validates, draws both lenses with the PR Lens renderer and
    uploads the SVGs; paste the image lines it prints above Key changes and move the mermaid
@@ -263,6 +267,6 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] Every anchor came from `anchor.mjs`, and the printed line is the line you meant
 - [ ] Every key change can be checked at one of the three anchors in thirty seconds
 - [ ] The first anchor is the caller, not something it calls
-- [ ] Each picture passes its gate and is drawn at the level of the headline change
+- [ ] Each picture passes its gate, is drawn at the level of the headline change, and was drawn by this run — not carried over
 - [ ] Every arrow in it exists in the code
 - [ ] Nothing was attached without a second yes, and nothing was posted as a comment or thread; the reading guide covers each core file once, hunks cut by `excerpt.mjs`, none for a rename
