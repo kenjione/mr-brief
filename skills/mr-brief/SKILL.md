@@ -39,8 +39,10 @@ name that they did not ask for is a failure, however good it is.
 - **Always-write flag.** If `$CLAUDE_CONFIG_DIR/.mr-brief-always` exists (default
   `~/.claude`), skip the question and write. Attaching still waits for a yes.
 
-Two things stay behind a **second yes**: attaching the brief to the MR, and posting any
-self-review comment. Show the brief in the conversation first.
+Attaching the brief to the MR stays behind a **second yes**. Show the brief in the
+conversation first. **The skill writes the description and nothing else**: it never posts
+comments, threads or review notes on the MR — what a reviewer should know about a file
+goes into the reading guide, inside the description.
 
 ## The contract
 
@@ -263,4 +265,4 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] The first anchor is the caller, not something it calls
 - [ ] Each picture passes its gate and is drawn at the level of the headline change
 - [ ] Every arrow in it exists in the code
-- [ ] Nothing was attached without a second yes; the reading guide covers each core file once, hunks cut by `excerpt.mjs`, none for a rename
+- [ ] Nothing was attached without a second yes, and nothing was posted as a comment or thread; the reading guide covers each core file once, hunks cut by `excerpt.mjs`, none for a rename

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.1
+- The skill writes the description and nothing else: no comments, threads or review notes on the MR, ever. The per-file guidance lives in the reading guide.
+
 ## 0.7.0
 - `render.mjs`: both pictures drawn with the PR Lens renderer (MIT, offline) from one graph document — lanes, typed nodes, NEW / CHANGED badges, a real sequence — uploaded to the MR on GitLab and embedded above Key changes. Mermaid stays as the editable source under details, and as the picture on GitHub.
 
