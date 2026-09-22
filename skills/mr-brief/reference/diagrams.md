@@ -1,46 +1,66 @@
 # Diagrams
 
-## Rendered, when the renderer is there
+## One document, two outputs
 
-Mermaid is the portable form and stays in the description as the editable source. When
-`npx` is available, draw the pictures properly with the PR Lens renderer (MIT, offline):
-one graph document gives both lenses — **architecture** (lanes per service, typed nodes,
-NEW / CHANGED badges, new edges green) and **data-flow** (a sequence with lifelines). On
-GitLab the SVGs are uploaded and embedded as images above Key changes; the mermaid moves
-under `<details>`. On GitHub there is no upload API — the mermaid stays where it is.
+You describe the picture as data and never draw it. `tmp/mr-brief/graph.json` is a PR Lens
+graph document: lanes, nodes, edges and one flow, each carrying a `delta`. Two scripts read
+it; both first check every `files` reference against the commit the document names and
+drop one that does not resolve, telling you which.
+
+- `render.mjs` — when `npx` is there: validates, draws the **architecture** lens (lanes,
+  typed nodes, NEW / CHANGED badges) and the **data-flow** lens (a sequence) with the PR Lens
+  renderer, uploads the SVGs on GitLab and prints the image lines. Nothing else.
+- `compile.mjs` — without `npx`, or on GitHub where nothing can be uploaded: prints the
+  same document as mermaid, each lens inside `<details>` with a descriptive summary.
+
+**One picture, once.** The SVG stands in the open above Key changes with one italic legend
+line under it; the mermaid appears only where there is no SVG, and then folded. The compiler
+decides shapes, colours, the translucent band behind what is new, and escaping — so the same
+document gives the same picture on every run, and nothing a label contains can break it.
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/scripts/render.mjs" tmp/mr-brief/graph.json --mr <iid>
+node "${CLAUDE_PLUGIN_ROOT}/scripts/render.mjs"  tmp/mr-brief/graph.json --mr <iid>
+node "${CLAUDE_PLUGIN_ROOT}/scripts/compile.mjs" tmp/mr-brief/graph.json
 ```
 
-The graph document, in the parts that matter (`pr-lens validate` checks the rest):
+The document, in the parts that matter (`pr-lens validate` checks the rest):
 
 ```json
 { "schemaVersion": "0.2.0", "kind": "graph", "id": "billing-sweep", "generatedAt": "…",
   "title": "…", "summary": "…", "lenses": ["architecture", "data-flow"],
-  "provenance": { "repo": {"host":"gitlab.com","owner":"g","name":"r"}, "base": {"ref":"main","sha":"…40 hex…"}, "head": {"ref":"feat","sha":"…"}, "generator": {"name":"mr-brief","version":"0.7.0"} },
-  "lanes": [ { "id": "billing", "label": "billing", "order": 1, "delta": "modified" } ],
-  "nodes": [ { "id": "sweep", "label": "Sweep worker", "kind": "job", "delta": "added", "lane": "billing", "subtitle": "nightly · retry 3" } ],
+  "provenance": { "repo": {"host":"gitlab.com","owner":"g","name":"r"}, "base": {"ref":"main","sha":"…40 hex…"}, "head": {"ref":"feat","sha":"…"}, "generator": {"name":"mr-brief","version":"0.8.0"} },
+  "lanes": [ { "id": "billing", "label": "billing (this repo)", "order": 0, "delta": "modified" } ],
+  "nodes": [ { "id": "sweep", "label": "Sweep worker", "kind": "job", "delta": "added", "lane": "billing", "subtitle": "nightly · retry 3",
+               "files": [ { "path": "app/workers/sweep_worker.rb", "startLine": 12 } ] } ],
   "edges": [ { "id": "e1", "from": "sweep", "to": "pay", "kind": "http", "delta": "added", "label": "cancel add-ons" } ],
-  "flows": [ { "id": "f1", "title": "Cancel", "delta": "added", "participants": [{"node":"sweep"},{"node":"pay"}],
+  "flows": [ { "id": "f1", "title": "One sweep run", "delta": "added", "participants": [{"node":"sweep"},{"node":"pay"}],
               "messages": [ { "id": "m1", "from": "sweep", "to": "pay", "label": "POST cancel", "kind": "sync", "delta": "added" } ] } ],
   "stats": { "filesChanged": 20, "additions": 402, "deletions": 2 } }
 ```
 
 - `delta` is the highlight: `added` · `modified` · `removed` · `unchanged`. Nothing else marks
-  what is new — so every node and edge carries one.
-- `kind` picks the icon: `service app module function route job queue datastore cache
-  external ui config test package other`; edges: `call http rpc event queue data dependency`.
-- One lane per service or boundary; the reviewer's own service is a lane, external systems
-  are `external` nodes in their own lane.
-- **Labels ≤ 22 characters** — longer ones are cut with an ellipsis. Put the rest in `subtitle`.
-- Message kinds: `sync` · `async` · `return` · `self`. A `self` message is a guard or a decision.
+  what is new — so every lane, node, edge and message carries one. Added nodes come out
+  yellow, added edges heavy, added messages inside one translucent band, an added participant
+  in a box. When every message is new the band is left out: mark nothing, say so in the legend.
+- `kind` picks the shape and the icon: nodes `service app module function route job queue
+  datastore cache external ui config test package other`; edges `call http rpc event queue
+  data dependency`; messages `sync` · `async` · `return` · `self`. A `self` message is a guard
+  or a decision. An `external` node is drawn with a dashed frame — the part we cannot change.
+- `files` on a node is its `path:line` — the file hint in the node and the permalink in the
+  SVG. One per node, the line where the change is. `startLine` is checked against the commit.
+- One lane per service or boundary, this repo's lane first (`order: 0`); external systems are
+  `external` nodes in their own lane.
+- **Size is a hard ceiling, refused before anything is drawn:** at most **7 nodes, 9 edges;
+  5 participants and 10 messages** in the flow. Over it, both scripts stop and say what to
+  cut. This is the *draw the change* rule made mechanical: the nodes the diff touched plus
+  the one or two they talk to; a datastore or a page is a message, not a lifeline; guards
+  are one `self` message. If the change genuinely has more parts, the MR has more parts too
+  — say so in the size check instead of drawing them all.
+- **Labels ≤ 22 characters** — the renderer cuts longer ones. Put the rest in `subtitle`.
 - Never a real identifier, token or customer value in a label — the same rule as everywhere.
 
-
-Loaded only when the gate in `SKILL.md` passes. The diagram sits above the key changes
-and is never collapsed: it is the one element that replaces reading instead of adding to
-it.
+The mermaid shown in the sections below is what the compiler produces from such a document.
+It is here so you know what the reader sees, not for you to type.
 
 ## Two kinds of picture
 
@@ -159,52 +179,20 @@ as text — four or five lines. Otherwise it goes under `<details>`.
 
 ## Mark what this MR added
 
-The diagram shows the flow after the change, so mark the part that is new:
+The picture shows the flow after the change, and `delta` is how the reader tells the new
+part from the rest: yellow nodes, heavy edges, one translucent band behind the run of
+messages this MR adds, a box around a participant it introduces. That is the compiler's
+job; yours is to set `delta` honestly on every element — `unchanged` is a claim too.
 
-```
-flowchart TD
-    R[charge request] --> P(subscription still live?<br/>charge_request.rb:163)
-    P -- no --> X[refuse]
-    P -- yes --> I[issue]
-    classDef step fill:#FFFFFF,stroke:#C3C9BF,stroke-width:1px,color:#191C1F
-    classDef new  fill:#F2DC5D,stroke:#8A6410,stroke-width:1.5px,color:#191C1F
-    classDef stop fill:#A8392B,stroke:#7A2A1F,stroke-width:1px,color:#FFFFFF
-    class R,I step
-    class P new
-    class X stop
-```
-
-Then one short italic line under the block. It starts with the colour key and ends with
+Then one short italic line under the picture. It starts with the colour key and ends with
 **the one non-obvious fact the picture cannot say by itself**:
 
 *Yellow: added by this MR. The flag is read once, at the top — passing nil is the whole
 off-switch.*
 
-The legend belongs to the diagram and does not count against the text limit. A legend that
-only decodes colours is a wasted line.
-
-- Give **every** node a class. Mermaid's default lilac boxes are what makes a diagram look
-  unconsidered, and an explicit fill is the only styling that survives GitLab.
-- `fill` and `color` always together. A fill with the renderer's default text colour is
-  unreadable in whichever theme you did not look at.
-- Three classes at most: unchanged, added, refuses. A fourth is a legend nobody reads.
-- Sequence diagrams cannot take `classDef`; they have two tools of their own, and both
-  must be **translucent** so the text keeps reading in either theme:
-  - a `rect` band behind the messages this MR added —
-    `rect rgba(242, 220, 93, 0.22)` … `end`. One band per run of new messages; a
-    band around everything says nothing.
-  - a `box` around a participant this MR introduced —
-    `box rgba(242, 220, 93, 0.35) new` / `participant PA as payments` / `end`.
-  Never an opaque `rgb(...)`: the band paints over the text colour of the other theme.
-- When everything in the diagram is new, mark nothing and say so in the legend.
-- Never `%%{init}%%` themes. The diagram must read on a light and a dark page.
-
-## Syntax that breaks in one renderer or the other
-
-- Parentheses, colons or commas inside a `participant … as` alias.
-- Unquoted `;` or `#` inside a label — both are control characters.
-- Markdown inside labels. Backticks and bold render literally.
-- Arrow spelling mixed within one diagram: `->>` solid call, `-->>` dashed return.
+The legend belongs to the picture and does not count against the text limit. A legend that
+only decodes colours is a wasted line. When everything in the picture is new, nothing is
+marked — say so in the legend.
 
 ## Honesty
 

@@ -53,9 +53,9 @@ goes into the reading guide, inside the description.
 | Series line | 1 line, only when the MR is one of a set |
 | What changes | 1 sentence, 140 chars |
 | Architecture | 1 line + the scenario as a sequence across services, only if a service now calls another it did not, or the MR is one of a set |
-| Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there, else mermaid |
+| Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there; the mermaid form always under `<details>` |
 | Key changes | `###` heading; exactly **3** bullets, `**claim** — reason`, most contentious first |
-| Where to look | `###` heading carrying `~N min` and `skip:`; exactly **3** permalinks as checkboxes, in reading order |
+| Where to look | `###` heading carrying `~N min` and `skip:`; exactly **3** verified links as checkboxes, in reading order — into the MR's changes tab when the MR exists |
 | Risk | `###` heading; 1–2 lines, the only blockquote |
 
 If the change does not fit in three claims, say so before writing: *"this is N separable
@@ -70,10 +70,17 @@ One sentence saying what is now true that was not before.
 
 **Architecture:** one line on what now talks to what that did not before. Then its picture.
 
-```mermaid
-sequenceDiagram ...       %% the scenario end to end; a translucent rect band on what this MR adds
-```
+![architecture](…uploaded SVG, when the renderer is there…)
 *Yellow: added by this MR. One sentence on the fact the picture cannot say by itself.*
+
+<details>
+<summary><strong>Flow</strong> — the scenario end to end</summary>
+
+```mermaid
+sequenceDiagram ...       %% compiled from graph.json — never typed
+```
+
+</details>
 
 ### Key changes
 - **The claim in bold** — the reason, after the dash
@@ -81,9 +88,9 @@ sequenceDiagram ...       %% the scenario end to end; a translucent rect band on
 - **The third** — its reason
 
 ### Where to look · ~12 min · skip the 890 lines of specs
-- [ ] **Start →** [file.rb:21](permalink#L21) — the entry point, top to bottom
-- [ ] [other.rb:103](permalink#L103) — the decision most worth arguing about
-- [ ] [spec.rb:92](permalink#L92) — the test that proves the interesting case
+- [ ] **Start →** [file.rb:21](…/diffs#…_21) — the entry point, top to bottom
+- [ ] [other.rb:103](…/diffs#…_103) — the decision most worth arguing about
+- [ ] [spec.rb:92](…/diffs#…_92) — the test that proves the interesting case
 
 ### Risk
 > The worst realistic outcome, and whether it fails loudly or silently.
@@ -124,17 +131,22 @@ flow does not do that.
    The risk it names is a hypothesis to re-verify against the code, never something to
    drop because the new draft did not happen to find it. **Pictures are the exception:
    they are rebuilt every run**, with whatever this version draws — an old mermaid block
-   is not "still holding", it is stale output. If `npx` is there, render and replace it;
-   the old block moves under `<details>` as source or goes. `/mr-brief fresh` means: do not
+   is not "still holding", it is stale output. Write the graph document again and let
+   `render.mjs` or `compile.mjs` draw it. `/mr-brief fresh` means: do not
    read the existing description at all — use it only to test the skill itself.
 3. **Size check** — three claims, or say so.
 4. **Anchors** — never type a `path:line` by hand. The script verifies the line exists
-   and builds the permalink:
+   and builds the link. For an MR that already exists, pass its number: the link then opens
+   the MR's **own changes tab at that line**, where the reviewer can leave a comment without
+   leaving the page — a blob permalink cannot take a comment. Without a number (the MR is
+   not created yet) it is a blob permalink at the head commit.
    ```bash
-   node "${CLAUDE_PLUGIN_ROOT}/scripts/anchor.mjs" app/x.rb:42 lib/y.rb:7   # add --sha <head> for an open MR
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/anchor.mjs" --mr <iid> --sha <head> app/x.rb:42 lib/y.rb:7
    ```
+   A line the MR did not touch has no place in the diff; the script falls back to the
+   permalink and says so — then ask whether that is the line to send the reviewer to.
    Reading order is call order: the caller before what it calls. `grep` the class name
-   if unsure.
+   if unsure. The reading guide's file links come from the same call.
 5. **Series** — if the branch carries a ticket key, list the open MRs that share it and
    order them by dependency (the MR whose output the next one reads goes first). The
    script reads the group from the remote, so nothing is guessed:
@@ -142,19 +154,27 @@ flow does not do that.
    node "${CLAUDE_PLUGIN_ROOT}/scripts/siblings.mjs" TICKET
    ```
    Two MRs from the same repo with the same title are a duplicate, not a series — say so.
-6. **Two picture gates, both default no.** Pictures are regenerated on every run, never
-   carried over from an earlier brief. When a gate passes and `npx` is available,
-   write `tmp/mr-brief/graph.json` (see `reference/diagrams.md`, *Rendered*) and run
-   `render.mjs --mr <iid>`: it validates, draws both lenses with the PR Lens renderer and
-   uploads the SVGs; paste the image lines it prints above Key changes and move the mermaid
-   under `<details>` as the source. Without `npx`, or on GitHub, the mermaid is the picture. *Architecture* — only if a service now
-   calls another it did not before, or the MR is one of a set; one line of text, then
-   the scenario end to end as a sequence diagram, one lifeline per service, this repo's
-   lifeline heavy. *Flow* — only if a
-   call between services, a state machine, a job or sweep, a webhook, or an order of
-   operations moved. Most MRs get none; a feature MR may get both. In a series the
-   architecture picture is the **same in every MR of the set**, with this repo framed —
-   that is the series map. Read `reference/diagrams.md` before drawing either.
+6. **Two picture gates, both default no.** *Architecture* — only if a service now calls
+   another it did not before, or the MR is one of a set. *Flow* — only if a call between
+   services, a state machine, a job or sweep, a webhook, or an order of operations moved.
+   Most MRs get none; a feature MR may get both. When a gate passes, **write the graph
+   document**, `tmp/mr-brief/graph.json` (`reference/diagrams.md`, *One document*): lanes,
+   nodes, edges and one flow, each carrying a `delta`, each node naming its `files`. **You
+   never type mermaid.** Then:
+   ```bash
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/render.mjs" tmp/mr-brief/graph.json --mr <iid>   # npx there: SVGs uploaded + mermaid source
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/compile.mjs" tmp/mr-brief/graph.json             # no npx, or GitHub: the mermaid is the picture
+   ```
+   Both check every `files` reference against the commit and drop one that does not
+   resolve — read what they dropped — and both **refuse a document over 7 nodes or 5
+   participants**: cut it, do not argue with it. Paste what they print above Key changes. **One
+   picture, once:** with SVGs uploaded, the image lines stand in the open with one italic
+   legend line under them and no mermaid anywhere — a second copy of the same picture is not
+   a source, it is clutter. Without SVGs, `compile.mjs` prints the picture as mermaid inside
+   `<details>` with a descriptive summary, and that is the picture. Pictures are regenerated
+   on every run, never carried over from an earlier brief. In a series the architecture
+   picture is the **same in every MR of the set**, with this repo's lane first — that is the
+   series map. Read `reference/diagrams.md` before writing the document.
 7. **Write** to a path git already ignores — `tmp/mr-brief/brief.md` when `git
    check-ignore -q tmp/` passes, otherwise `.mr-brief.md` (and say it wants a `.gitignore`
    line). Never under `.git/`: the Write tool treats it as sensitive and refuses. Then
@@ -264,9 +284,10 @@ Write it the way you would say it to a colleague at their desk.
 `lint.mjs` checks the shape. You check what it cannot:
 
 - [ ] The author said yes, or invoked the skill themselves
-- [ ] Every anchor came from `anchor.mjs`, and the printed line is the line you meant
+- [ ] Every anchor came from `anchor.mjs` with `--mr` when the MR exists, and the printed line is the line you meant
 - [ ] Every key change can be checked at one of the three anchors in thirty seconds
 - [ ] The first anchor is the caller, not something it calls
 - [ ] Each picture passes its gate, is drawn at the level of the headline change, and was drawn by this run — not carried over
+- [ ] No mermaid was typed: any block came out of `compile.mjs`, sits under `<details>`, and only because there is no SVG
 - [ ] Every arrow in it exists in the code
 - [ ] Nothing was attached without a second yes, and nothing was posted as a comment or thread; the reading guide covers each core file once, hunks cut by `excerpt.mjs`, none for a rename

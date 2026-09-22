@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0
+- Links point into the MR's own changes tab at the line (`anchor.mjs --mr`), so the reviewer can comment where they read; a line the MR did not touch falls back to the blob permalink, marked. GitLab and GitHub anchor formats.
+- The model never writes mermaid. Pictures are a graph document; `compile.mjs` turns it into mermaid (shapes, colours, the band behind what is new, escaping all decided once), `render.mjs` draws SVGs from the same document and prints the mermaid source too. Idea borrowed from gitdiagram (MIT).
+- Every `files` reference in the document is checked against the commit before drawing; one that does not resolve is dropped and named, not retried.
+- A picture over 7 nodes / 9 edges, or a flow over 5 participants / 10 messages, is refused before anything is drawn, with what to cut. Draw the change, not the system — now enforced.
+- One picture, once: with SVGs uploaded there is no mermaid; where an image cannot be shown the mermaid stands in for it, folded under `<details>` with a descriptive summary. Lint knows a folded picture still has to sit above Key changes.
+
 ## 0.7.2
 - Pictures are rebuilt on every run. An earlier brief's claims are re-verified and kept; its diagram is stale output and is replaced with what this version draws.
 

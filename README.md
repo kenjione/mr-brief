@@ -45,9 +45,8 @@ Cancelling a subscription now also cancels every add-on billed against it.
 
 **Architecture:** billing now calls the payments API for the first time, from a nightly sweep.
 
-```mermaid
-sequenceDiagram … the scenario end to end, what is new marked in yellow
-```
+![architecture](… the scenario end to end as an SVG, what is new marked in yellow …)
+*Yellow: added by this MR — the sweep worker, and the cancel call it makes.*
 
 ### Key changes
 - **Cancelled state is re-read from the provider every sweep** — a stale copy cannot keep an add-on billing
@@ -68,7 +67,7 @@ sequenceDiagram … the scenario end to end, what is new marked in yellow
 ▸ **Reading guide** — 3 files worth opening, with their hunks · what to skip · glossary
 ````
 
-Every link is a permalink that was checked against the commit before it was written. Every line is there because it removes reading: a picture instead of a paragraph, a link instead of a path, a bold claim instead of a sentence to parse, a `skip:` instead of forty files opened for nothing.
+Every link was checked against the commit before it was written, and on an open MR it lands in the MR's own changes tab at that line — the reviewer reads and comments in one place. Every line is there because it removes reading: a picture instead of a paragraph, a link instead of a path, a bold claim instead of a sentence to parse, a `skip:` instead of forty files opened for nothing.
 
 ## From diff to description
 
@@ -76,8 +75,11 @@ Every link is a permalink that was checked against the commit before it was writ
    config / generated and names the pure renames. On a 20-file MR that is typically 8 files
    to read and 12 to skip — the `skip:` line is written from these counts, not by feel.
 2. **Write the brief** from the core diff: one sentence, the architecture line and its
-   sequence when a service now calls one it did not, three key changes, three verified
-   permalinks, one risk.
+   picture when a service now calls one it did not, three key changes, three verified
+   permalinks, one risk. The picture is written as data — a graph document with a `delta`
+   on every node and arrow — and drawn by a script: SVGs from the PR Lens renderer where
+   `npx` is available, mermaid compiled from the same document everywhere else. Nobody
+   types mermaid, and every file a node names is checked against the commit first.
 3. **Add the reading guide** under the fold: for each core file, *what changed · what to
    check* and its decisive hunk as a `diff` block — ten lines at most, cut by `excerpt.mjs`
    from the real diff. Then the files to skip and the files that only moved. The reviewer
@@ -93,10 +95,10 @@ Every link is a permalink that was checked against the commit before it was writ
 |---|---|
 | **15 lines** of text, hard limit | the diagram does not count |
 | **3** key changes | each a decision someone could disagree with, most contentious first |
-| **3** places to look | verified permalinks, caller before callee, with a minutes estimate and a `skip:` |
+| **3** places to look | verified links into the MR's changes tab, caller before callee, with a minutes estimate and a `skip:` |
 | **1** risk line | worst realistic outcome, loud or silent, how to roll back |
 | **Architecture** | one line and one sequence across services — only when a service now calls one it did not |
-| **Diagram** | only when a call path, state machine, job or webhook moved; what is new marked — rendered SVG on GitLab, mermaid elsewhere |
+| **Diagram** | only when a call path, state machine, job or webhook moved; what is new marked — a rendered SVG, or mermaid folded where an image cannot be shown; never both |
 | **Reading guide** | under the fold: ≤ 8 files, each with one line and one hunk of ≤ 10 diff lines; renames are one line for all |
 | **Series line** | one line at the top when the MR is one of a set — the same in every MR of the set |
 
@@ -149,13 +151,14 @@ skills/mr-brief/SKILL.md          the rules
 skills/mr-brief/reference/        how and when to draw
 hooks/offer.mjs                   the once-per-branch offer
 hooks/update-check.mjs            once a day, tells you when a newer version is published
-scripts/anchor.mjs                path:line → permalink, refuses a line that does not exist
+scripts/anchor.mjs                path:line → a link into the MR's diff at that line (or a permalink), refuses a line that does not exist
 scripts/lint.mjs                  checks a brief against the contract
 scripts/siblings.mjs              open MRs sharing the branch's ticket key (GitLab)
 scripts/focus.mjs                 sorts the diff into read-closely / skip, names the renames
 scripts/preview.mjs               the brief as the MR page will show it — platform renderer + mermaid, both themes
 scripts/excerpt.mjs               the decisive hunk of a file as a diff block, ten lines at most, for the reading guide
 scripts/render.mjs                draws both pictures with the PR Lens renderer and uploads them to the MR (GitLab)
+scripts/compile.mjs               the same graph document as mermaid — the model never writes mermaid by hand
 templates/                        the empty shape for GitLab and GitHub — usable with no agent at all
 ci/                               drop-in jobs that lint a description and comment, never block
 evals/                            lint fixtures, a real-run harness, a rubric
@@ -167,4 +170,4 @@ evals/                            lint fixtures, a real-run harness, a rubric
 
 Review effectiveness collapses past a few hundred changed lines; reviewers stop reading and start approving. A longer description does not fix that — it is the same failure one screen earlier. What moves review outcomes is a description that gets *finished*: short, ordered the way the code should be read, with nothing in it that a reviewer has to take on trust.
 
-MIT licensed. Pictures are drawn with the [PR Lens](https://github.com/coldteadotai/pr-lens) renderer, also MIT.
+MIT licensed. Pictures are drawn with the [PR Lens](https://github.com/coldteadotai/pr-lens) renderer, also MIT. Writing the picture as a graph and compiling it, instead of letting the model type mermaid, is [gitdiagram](https://github.com/ahmedkhaleel2004/gitdiagram)'s idea, also MIT.

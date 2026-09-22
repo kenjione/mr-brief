@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "0.2.0",
+  "kind": "graph",
+  "id": "subscription-addon-cascade",
+  "generatedAt": "2026-09-18T09:00:00.000Z",
+  "title": "Cancelled subscriptions now cancel their add-ons",
+  "summary": "A nightly sweep asks the provider for each active subscription's state and, when it is cancelled, cancels the add-ons through the payments API and marks the row.",
+  "lenses": ["architecture", "data-flow"],
+  "provenance": {
+    "repo": { "host": "gitlab.com", "owner": "acme", "name": "billing" },
+    "base": { "ref": "main", "sha": "1111111111111111111111111111111111111111" },
+    "head": { "ref": "feat/addon-cascade", "sha": "2222222222222222222222222222222222222222" },
+    "generator": { "name": "mr-brief", "version": "0.8.0" }
+  },
+  "lanes": [
+    { "id": "billing", "label": "billing (this repo)", "order": 0, "delta": "modified" },
+    { "id": "outside", "label": "other services", "order": 1, "delta": "unchanged" }
+  ],
+  "nodes": [
+    { "id": "sweep", "label": "Add-on sweep", "kind": "job", "delta": "added", "lane": "billing", "subtitle": "nightly · retry 3", "files": [{ "path": "app/workers/addon_sweep_worker.rb", "startLine": 12 }] },
+    { "id": "row", "label": "Subscription row", "kind": "datastore", "delta": "modified", "lane": "billing", "subtitle": "state, last_error" },
+    { "id": "provider", "label": "Provider", "kind": "external", "delta": "unchanged", "lane": "outside" },
+    { "id": "payments", "label": "Payments API", "kind": "service", "delta": "unchanged", "lane": "outside" }
+  ],
+  "edges": [
+    { "id": "e1", "from": "sweep", "to": "provider", "kind": "http", "delta": "added", "label": "subscription state?" },
+    { "id": "e2", "from": "sweep", "to": "payments", "kind": "http", "delta": "added", "label": "cancel add-ons [all]" },
+    { "id": "e3", "from": "sweep", "to": "row", "kind": "data", "delta": "added", "label": "mark cancelled" }
+  ],
+  "flows": [
+    {
+      "id": "cascade",
+      "title": "One sweep run",
+      "delta": "added",
+      "participants": [{ "node": "sweep" }, { "node": "provider" }, { "node": "payments" }, { "node": "row" }],
+      "messages": [
+        { "id": "m1", "from": "sweep", "to": "provider", "label": "fetch subscription state", "kind": "sync", "delta": "unchanged" },
+        { "id": "m2", "from": "provider", "to": "sweep", "label": "cancelled flag", "kind": "return", "delta": "unchanged" },
+        { "id": "m3", "from": "sweep", "to": "payments", "label": "cancel add-ons; one call per add-on", "kind": "sync", "delta": "added", "repeat": 3 },
+        { "id": "m4", "from": "payments", "to": "sweep", "label": "2xx or 404", "kind": "return", "delta": "added" },
+        { "id": "m5", "from": "sweep", "to": "row", "label": "mark cancelled", "kind": "sync", "delta": "added" },
+        { "id": "m6", "from": "sweep", "to": "sweep", "label": "any failure: record last_error, keep active", "kind": "self", "delta": "added" }
+      ]
+    }
+  ],
+  "stats": { "filesChanged": 20, "additions": 402, "deletions": 2 }
+}

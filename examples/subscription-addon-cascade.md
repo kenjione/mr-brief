@@ -4,6 +4,9 @@ Cancelling a subscription now also cancels every add-on billed against it.
 
 **Architecture:** billing now calls the payments API for the first time, from a nightly sweep. Nothing removed.
 
+<details>
+<summary><strong>Flow</strong> — one sweep run, end to end</summary>
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -22,7 +25,10 @@ sequenceDiagram
     end
     Note over SW,DB: any failure: record last_error, keep active, retry next run
 ```
+
 *Yellow: added by this MR — the sweep worker, and the cancel call it makes.*
+
+</details>
 
 ### Key changes
 - **Cancelled state is re-read from the provider every sweep** — never from the cached expiry, so a stale copy cannot keep an add-on billing
