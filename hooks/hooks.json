@@ -25,6 +25,19 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/stale.mjs\"",
+            "timeout": 10,
+            "statusMessage": "mr-brief: did this push leave the MR brief behind?"
+          }
+        ]
+      }
     ]
   }
 }

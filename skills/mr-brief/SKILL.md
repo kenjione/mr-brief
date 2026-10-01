@@ -4,6 +4,7 @@ description: "Write a merge/pull request description a reviewer actually reads: 
 license: MIT
 allowed-tools:
   - AskUserQuestion
+  - Agent
   - Bash
   - Read
   - Grep
@@ -43,6 +44,26 @@ Attaching the brief to the MR stays behind a **second yes**. Show the brief in t
 conversation first. **The skill writes the description and nothing else**: it never posts
 comments, threads or review notes on the MR — what a reviewer should know about a file
 goes into the reading guide, inside the description.
+
+## Review mode — someone else's MR
+
+`/mr-brief review <iid | url>` is for the reviewer, on an MR that came without a brief. It
+is asked for explicitly, so there is no Step 0. It writes **only to your machine**: nothing
+is attached, posted, uploaded or commented, and the checkout never moves.
+
+1. Fetch the MR without checking it out, and use its refs everywhere below:
+   ```bash
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/mr-ref.mjs" <iid>     # prints --sha <head> --target <target>
+   ```
+2. `focus.mjs <target> --sha <head>`, then read the core diff the same way as for a brief.
+3. Write `tmp/mr-brief/review-<iid>.md`: the lead sentence, **three questions to settle**
+   instead of key changes (the decisions you would push back on, each with its anchor), the
+   three places to look, the risk as you read it, and the reading guide (step 8, delegated).
+   The picture, when a gate passes, comes from `compile.mjs` as folded mermaid — never
+   uploaded to someone else's project.
+4. Check the questions' premises with the `claim-checker` (step 9): a question built on a
+   misread is worse than none.
+5. Preview it (step 10) and stop. What you post on the MR, and where, is yours to decide.
 
 ## The contract
 
@@ -143,6 +164,9 @@ flow does not do that.
    ```bash
    node "${CLAUDE_PLUGIN_ROOT}/scripts/anchor.mjs" --mr <iid> --sha <head> app/x.rb:42 lib/y.rb:7
    ```
+   On GitLab the link is pinned to the pushed version of the diff whose head is `<head>`
+   (`diffs?diff_id=…`), so a later push cannot move the line. The script says when no pushed
+   version matches — push first, or the links will drift.
    A line the MR did not touch has no place in the diff; the script falls back to the
    permalink and says so — then ask whether that is the line to send the reviewer to.
    Reading order is call order: the caller before what it calls. `grep` the class name
@@ -182,48 +206,73 @@ flow does not do that.
    ```bash
    node "${CLAUDE_PLUGIN_ROOT}/scripts/lint.mjs" tmp/mr-brief/brief.md
    ```
-8. **Preview it the way the MR will show it**, then show that:
-   ```bash
-   node "${CLAUDE_PLUGIN_ROOT}/scripts/preview.mjs" tmp/mr-brief/brief.md
-   ```
-   The platform's own Markdown renderer draws the text (`glab api markdown` / `gh api
-   /markdown`), the page draws the mermaid, and a toggle shows both themes. Nobody says yes
-   to a description they have only seen as raw Markdown in a chat.
-9. **Add the reading guide under `<details>`** — the diff made edible without leaving the
-   description. For each core file from `focus.mjs` (eight at most): one line — *what
-   changed · what to check* — with the file as a permalink, then the **decisive hunk** as a
-   ```` ```diff ```` block cut by the script, never by hand and never a whole file:
-   ```bash
-   node "${CLAUDE_PLUGIN_ROOT}/scripts/excerpt.mjs" app/x.rb:42 lib/y.rb:7 --sha <head> --lines 10
-   ```
+8. **Reading guide, delegated.** Spawn the plugin's `reading-guide` agent (a smaller model than
+   yours, so you do not spend your own budget opening every file — not the smallest: a test
+   run on haiku misread the files). Give it the scripts directory (`${CLAUDE_PLUGIN_ROOT}/scripts`, resolved), the MR
+   number if there is one, the head sha, the target, the lead sentence, the three key changes
+   and the core files from `focus.mjs`. It writes `tmp/mr-brief/reading-guide.md`: per file,
+   the link, *what changed · what to check*, and the decisive hunk cut by `excerpt.mjs`.
+   **Read what it wrote** — you own the brief — fix a line that restates the hunk or misses
+   the trap, then paste it under `<details>`:
    ```markdown
+   ---
+
+   <details>
+   <summary><strong>Reading guide</strong> — 8 files with their decisive hunks · what to skip</summary>
+
    **Reading guide**
 
-   **[worker.rb:22](permalink)** — posts the usage after five guards · the reply is never read, so a 422 is a silent loss
+   **[worker.rb:22](link)** — posts the usage after five guards · the reply is never read, so a 422 is a silent loss
    `app/workers/worker.rb:15–24` @ 1bbdfe2
    ```diff
    +    return unless product_code.present?
-   +
-   +    InvoiceManager::BillableUsage.create(
    ```
 
    Skip: 7 spec files (they all stub `.create`), 2 admin views, `schema.rb`.
    Moved, not changed: `a.rb → b.rb`.
+
+   </details>
    ```
-   *What changed* is the decision, not a restatement; *what to check* is the trap or the
-   question a reviewer cannot see from the hunk alone. Ten diff lines per file at most;
-   plumbing files get the one line and no hunk. Pure renames are one line, never an entry.
-   The `@ sha` says which revision the hunk shows — after a new push, re-run the brief.
-10. **Attach** — only on a second yes:
+   Ten diff lines per file at most; plumbing files get the one line and no hunk; pure
+   renames are one line, never an entry. No subagents in this runtime → do it yourself the
+   same way, with the same scripts.
+9. **Check the claims with a second reader.** The writer is the worst judge of its own
+   claims: one real run asserted library behaviour the library's source contradicts. Build
+   the packet, then spawn the plugin's `claim-checker` agent on it — it has none of your
+   context, reads the code and library sources itself, and returns a verdict per claim:
    ```bash
-   glab mr create --description-file tmp/mr-brief/brief.md      # gh pr create --body-file …
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/claims.mjs" tmp/mr-brief/brief.md --sha <head> --target <target>
    ```
-   For an MR that already exists, `glab mr update` takes no file; PUT the JSON yourself
-   and read the description back to confirm it round-tripped:
+   - **supported** → keep it; if the checker cites a better line, consider it for an anchor.
+   - **contradicted** → rewrite the claim to what the code does, or drop it. Never argue it back.
+   - **unsupported** → add the anchor that settles it and re-check, or soften it to what you
+     can show, or drop it.
+   Then lint again, and tell the author in one line per changed claim what the checker found.
+   No subagents in this runtime → read `claims.md` cold, as if someone else wrote the brief,
+   and apply the same three verdicts.
+10. **Preview it the way the MR will show it**, then show that:
    ```bash
-   node -e 'require("fs").writeFileSync("tmp/mr-brief/body.json", JSON.stringify({description: require("fs").readFileSync("tmp/mr-brief/brief.md","utf8")}))'
-   glab api -X PUT -H "Content-Type: application/json" "projects/<group%2Frepo>/merge_requests/<iid>" --input tmp/mr-brief/body.json
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/preview.mjs" tmp/mr-brief/brief.md
    ```
+   The platform's own Markdown renderer draws the text (`glab api markdown` / `gh api
+   /markdown`), the page draws any mermaid, and a toggle shows both themes. Nobody says yes
+   to a description they have only seen as raw Markdown in a chat.
+11. **Attach** — only on a second yes — with the script, never by hand. It stamps the
+   commit the brief describes onto line one (`<!-- mr-brief v1 head=<sha> -->`), refuses a
+   brief that fails lint, writes the description and nothing else, and records the MR so the
+   post-push hook can tell when the brief has been pushed past:
+   ```bash
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/attach.mjs" tmp/mr-brief/brief.md --mr <iid> --sha <head>
+   ```
+   No MR yet: create it first with the brief as its description (`glab mr create
+   --description-file …` / `gh pr create --body-file …`), then re-run the anchors with `--mr`
+   so the links land in its diff, and attach.
+
+**After a push.** When the plugin's hook says the branch moved past the commit the brief
+describes, ask the author the one line it gives you. On yes, re-run the brief — the existing
+one is input — and attach with a second yes. GitLab links stay pinned to the version they
+were written for, so an old brief never sends a reader to the wrong line; it can still claim
+something the new commits changed.
 
 ## Words
 
@@ -290,4 +339,6 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] Each picture passes its gate, is drawn at the level of the headline change, and was drawn by this run — not carried over
 - [ ] No mermaid was typed: any block came out of `compile.mjs`, sits under `<details>`, and only because there is no SVG
 - [ ] Every arrow in it exists in the code
+- [ ] Every key change and risk came back **supported** from the claim-checker, or was rewritten until it did
+- [ ] It was attached with `attach.mjs`, so line one names the commit it describes
 - [ ] Nothing was attached without a second yes, and nothing was posted as a comment or thread; the reading guide covers each core file once, hunks cut by `excerpt.mjs`, none for a rename

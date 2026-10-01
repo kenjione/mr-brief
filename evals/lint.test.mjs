@@ -13,6 +13,7 @@ const fixtures = join(here, "fixtures");
 
 const EXPECT = {
   "fail-too-long.md": ["lines of text; the limit is 15", "banned opener", "4 key changes", "2 \"- [ ]\" entries", "not a permalink", "carries 2 links", "2 blockquotes", "needs a minutes estimate"],
+  "fail-guide-too-long.md": ["reading guide has 9 files; at most 8"],
   "fail-shape.md": ["mr-brief v1", "missing ### Key changes", "**Architecture:** is present but empty", "must begin with **Start →**", "<summary> must be on its own line"],
 };
 

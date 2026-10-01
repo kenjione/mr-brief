@@ -14,7 +14,7 @@ jobs:
       - name: the shipped example passes its own lint
         run: node scripts/lint.mjs examples/subscription-addon-cascade.md
       - name: lint fixtures and the compiler
-        run: node --test evals/lint.test.mjs evals/compile.test.mjs evals/anchor.test.mjs
+        run: node --test evals/lint.test.mjs evals/compile.test.mjs evals/anchor.test.mjs evals/brief.test.mjs
       - name: the fixture graph validates and compiles
         run: npx --yes @coldtea/pr-lens-cli@0.6.1 validate evals/fixtures/graph.json && node scripts/compile.mjs evals/fixtures/graph.json > /dev/null
       - name: runtime copies are in sync

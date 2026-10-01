@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0
+- **Links stay put.** GitLab diff links are pinned to the MR version the brief was written for (`diffs?diff_id=…`), so a later push cannot move the line under the reader. GitHub has no such pin; there the stale check below is the guard.
+- **A brief knows which commit it describes.** `attach.mjs` stamps `head=<sha>` on line one, refuses a brief that fails lint, and records the MR. A PostToolUse hook says, once per pushed commit, when the branch has moved past the brief; `lint.mjs --head` and both CI jobs report it too.
+- **Claims are checked by a second reader.** `claims.mjs` builds a packet of every key change and risk with the code behind each link; the `claim-checker` agent (its own context, reads library sources) returns supported / contradicted / unsupported, and what it cannot back is rewritten or dropped.
+- **Review mode.** `/mr-brief review <iid>` writes a reading guide and three questions for someone else's MR, fetched by `mr-ref.mjs` without a checkout. Nothing leaves your machine.
+- **Metrics.** `metrics.mjs` lines up merged MRs with and without a brief: time to first review comment, comments per MR, MRs merged with none, boxes ticked.
+- **Cheaper on large MRs.** The reading guide is built by the `reading-guide` agent on sonnet (haiku was tried and misread the files). On the 47-file test MR: $2.14 and 2.5 min, from $4.96 and 12 min.
+
 ## 0.8.0
 - Links point into the MR's own changes tab at the line (`anchor.mjs --mr`), so the reviewer can comment where they read; a line the MR did not touch falls back to the blob permalink, marked. GitLab and GitHub anchor formats.
 - The model never writes mermaid. Pictures are a graph document; `compile.mjs` turns it into mermaid (shapes, colours, the band behind what is new, escaping all decided once), `render.mjs` draws SVGs from the same document and prints the mermaid source too. Idea borrowed from gitdiagram (MIT).

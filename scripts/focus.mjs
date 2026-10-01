@@ -5,6 +5,7 @@
 //   focus.mjs                      # against origin/<default branch>
 //   focus.mjs origin/main          # against a given target
 //   focus.mjs --json
+//   focus.mjs origin/main --sha <commit>   # someone else's MR, fetched by mr-ref.mjs — no checkout
 //
 // Buckets are heuristics over paths; they are printed, not hidden, so the author can
 // disagree. "core" is what is left after everything skippable is taken out.
@@ -13,14 +14,15 @@ import { execFileSync } from "node:child_process";
 
 const args = process.argv.slice(2);
 const json = args.includes("--json");
-const targetArg = args.find((a) => !a.startsWith("--"));
+const head = args.includes("--sha") ? args[args.indexOf("--sha") + 1] : "HEAD";
+const targetArg = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--sha");
 const git = (...a) => execFileSync("git", a, { stdio: ["ignore", "pipe", "ignore"] }).toString();
 
 let target = targetArg;
 if (!target) {
   try { target = git("symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD").trim(); } catch { target = "origin/main"; }
 }
-const range = `${target}...HEAD`;
+const range = `${target}...${head}`;
 
 const RULES = [
   ["generated", /(^|\/)(db\/schema\.rb|db\/structure\.sql|Gemfile\.lock|package-lock\.json|yarn\.lock|pnpm-lock\.yaml|poetry\.lock|Cargo\.lock|go\.sum|composer\.lock)$|\.min\.(js|css)$|(^|\/)(dist|build|vendor|node_modules|coverage)\//],

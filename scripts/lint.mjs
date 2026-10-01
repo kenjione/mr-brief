@@ -3,17 +3,27 @@
 // failure and exit 1. Meant to run before attaching, and as a soft check in CI.
 //
 //   lint.mjs .mr-brief.md
+//   lint.mjs desc.md --head <sha>      # also say whether the brief still describes that commit
+//
+// A stale brief is a note, not a failure: the shape is still right, the content may not be.
 
 import { readFileSync } from "node:fs";
+import { MARKER, readHead, isStale } from "./lib/marker.mjs";
 
-const file = process.argv[2];
-if (!file) { console.error("usage: lint.mjs <brief.md>"); process.exit(64); }
+const argv = process.argv.slice(2);
+const file = argv.find((a, i) => !a.startsWith("--") && argv[i - 1] !== "--head");
+const current = argv.includes("--head") ? argv[argv.indexOf("--head") + 1] : null;
+if (!file) { console.error("usage: lint.mjs <brief.md> [--head <sha>]"); process.exit(64); }
 const src = readFileSync(file, "utf8");
 const lines = src.split("\n");
 const fail = [];
 
 // ---- marker
-if (!/<!--\s*mr-brief v1\s*-->/.test(lines[0] ?? "")) fail.push("first line must carry <!-- mr-brief v1 -->");
+if (!MARKER.test(lines[0] ?? "")) fail.push("first line must carry <!-- mr-brief v1 -->");
+const notes = [];
+const head = readHead(src);
+if (current && head && isStale(head, current)) notes.push(`stale — the brief describes ${head.slice(0, 9)}, the MR is at ${current.slice(0, 9)}: re-run /mr-brief, or check the claims still hold`);
+if (current && head === null) notes.push("the brief names no commit (no head= on line one) — it cannot tell when it went stale");
 
 // ---- carve out what does not count as text: mermaid blocks (+ one legend line), <details>
 let inMermaid = false, inDetails = false, afterMermaid = false, mermaidBlocks = 0, mermaidAt = -1, pictures = 0, pictureAt = -1, foldedPictures = 0, foldedAt = -1;
@@ -101,6 +111,17 @@ if (dOpen >= 0) {
   if (dClose > 0 && (lines[dClose - 1] ?? "x").trim() !== "") fail.push("blank line required before </details>");
 }
 
+// ---- reading guide: eight files at most, or it is the diff again
+{
+  const rg = lines.findIndex((l) => /^\*\*Reading guide\*\*\s*$/.test(l.trim()));
+  if (rg >= 0) {
+    const end = lines.findIndex((l, i) => i > rg && l.trim() === "</details>");
+    const entries = lines.slice(rg + 1, end < 0 ? undefined : end).filter((l) => /^\*\*\[[^\]]+\]\(/.test(l.trim())).length;
+    if (entries > 8) fail.push(`reading guide has ${entries} files; at most 8 — keep the core, move the rest to the Skip line`);
+  }
+}
+
+notes.forEach((n) => console.log(`note: ${n}`));
 if (fail.length) { fail.forEach((f) => console.log(`✗ ${f}`)); process.exit(1); }
 const pics = mermaidBlocks + pictures;
 console.log(`ok — ${text.length} lines of text${pics === 1 ? ", one picture" : pics === 2 ? ", two pictures" : pics > 2 ? `, ${pics} pictures` : ""}`);

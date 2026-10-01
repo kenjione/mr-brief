@@ -24,14 +24,14 @@ const ALWAYS_FLAG = join(process.env.CLAUDE_CONFIG_DIR || join(process.env.HOME 
 
 const ALWAYS =
   "mr-brief: an MR is about to be opened. The author has set the always-write flag, so do not ask —\n" +
-  "run the mr-brief skill now, show the brief, then attach it with --description-file (glab / gh)\n" +
-  "or your wrapper's file option. Attaching still needs the author's yes.";
+  "run the mr-brief skill now and show the brief. Attaching still needs the author's yes — then follow\n" +
+  "the skill's attach step (create the MR with the brief, then attach.mjs).";
 
 const OFFER =
   "mr-brief: an MR is about to be opened and no brief has been offered on this branch.\n" +
   "Before running that command again, ask the author exactly one line:\n\n" +
   "  Want me to write an mr-brief for this MR? (15 lines, 3 places to look, diagram only if the wiring moved) — yes / no / show me the shape first\n\n" +
-  "yes → run the mr-brief skill, then attach the result with --description-file (glab / gh) or your wrapper's file option.\n" +
+  "yes → run the mr-brief skill; attaching follows its attach step and needs a second yes.\n" +
   "no, or no answer → re-run the command exactly as it was. This hook will not interrupt this branch again.";
 
 // One line about a newer version, from the cache the SessionStart hook keeps. No network.

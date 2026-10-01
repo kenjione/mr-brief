@@ -23,7 +23,7 @@ const git = (...a) => execFileSync("git", a, { cwd: repo, stdio: ["ignore", "pip
 git("worktree", "add", "--detach", wt, ref);
 
 try {
-  const allowed = "Bash(git:*),Bash(node:*),Bash(glab:*),Bash(gh:*),Bash(grep:*),Bash(cat:*),Bash(sed:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(ls:*),Bash(mkdir:*),Read,Grep,Glob,Write";
+  const allowed = "Bash(git:*),Bash(node:*),Bash(glab:*),Bash(gh:*),Bash(grep:*),Bash(cat:*),Bash(sed:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(ls:*),Bash(mkdir:*),Bash(npx:*),Agent,Read,Grep,Glob,Write";
   const t0 = Date.now();
   const r = spawnSync("claude", ["-p", "/mr-brief", "--output-format", "json", "--allowedTools", allowed], { cwd: wt, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   const out = JSON.parse(r.stdout || "{}");

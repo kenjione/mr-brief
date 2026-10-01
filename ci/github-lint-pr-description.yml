@@ -1,5 +1,6 @@
 # .github/workflows/lint-pr-description.yml — lints the PR body against the mr-brief
-# contract and comments the result. Never blocks: continue-on-error.
+# contract and comments the result — including whether the brief still describes the PR's
+# head commit. Never blocks: continue-on-error.
 name: lint-pr-description
 on:
   pull_request:
@@ -19,7 +20,7 @@ jobs:
         run: |
           printf '%s' "$BODY" > desc.md
           grep -q "mr-brief v1" desc.md || { echo "no mr-brief marker — skipping"; exit 0; }
-          node mr-brief/scripts/lint.mjs desc.md | tee lint.txt || true
+          node mr-brief/scripts/lint.mjs desc.md --head "${{ github.event.pull_request.head.sha }}" | tee lint.txt || true
       - name: comment
         if: always()
         env: { GH_TOKEN: "${{ github.token }}" }

@@ -12,7 +12,9 @@
 // With `--mr`, the link opens the changes tab of that MR / PR scrolled to the line, so the
 // reviewer reads and comments in one place. That needs the line to be in the diff; a line
 // the MR did not touch has no home there and falls back to the blob permalink, marked.
-//   GitLab: /-/merge_requests/N/diffs#<sha1(path)>_<old>_<new>   GitHub: /pull/N/files#diff-<sha256(path)>R<new>
+//   GitLab: /-/merge_requests/N/diffs?diff_id=<version>#<sha1(path)>_<old>_<new> — pinned to the
+//           pushed version whose head is --sha, so a later push cannot move the line
+//   GitHub: /pull/N/files#diff-<sha256(path)>R<new> — follows the latest push; no pin exists
 //
 // Output, per anchor: the markdown link, then the line itself so you can check
 // it is the line you meant.
@@ -20,6 +22,7 @@
 import { execFileSync } from "node:child_process";
 import { basename } from "node:path";
 import { diffPositions, diffUrl } from "./lib/diff-anchor.mjs";
+import { remote as remoteOf, api } from "./lib/remote.mjs";
 
 const args = process.argv.slice(2);
 let sha = "HEAD", remote = "origin", json = false, mr = null, target = null;
@@ -41,24 +44,26 @@ function git(...a) {
   return execFileSync("git", a, { stdio: ["ignore", "pipe", "pipe"] }).toString();
 }
 
-// git@host:group/repo.git | ssh://git@host/group/repo.git | https://host/group/repo(.git)
-function httpsBase(url) {
-  let m = url.match(/^git@([^:]+):(.+?)(?:\.git)?\/?$/);
-  if (m) return { host: m[1], base: `https://${m[1]}/${m[2]}` };
-  m = url.match(/^ssh:\/\/(?:[^@]+@)?([^/]+)\/(.+?)(?:\.git)?\/?$/);
-  if (m) return { host: m[1], base: `https://${m[1]}/${m[2]}` };
-  m = url.match(/^https?:\/\/(?:[^@]+@)?([^/]+)\/(.+?)(?:\.git)?\/?$/);
-  if (m) return { host: m[1], base: `https://${m[1]}/${m[2]}` };
-  throw new Error(`cannot parse remote url: ${url}`);
-}
-
 const fullSha = git("rev-parse", "--verify", `${sha}^{commit}`).trim();
-const { host, base } = httpsBase(git("remote", "get-url", remote).trim());
-const github = host.includes("github.com");
+const r = remoteOf(remote);
+const { base, github } = r;
 const blob = github ? "blob" : "-/blob";
 if (mr && !target) { try { target = git("symbolic-ref", "--quiet", "--short", `refs/remotes/${remote}/HEAD`).trim(); } catch { target = `${remote}/main`; } }
 
-const positions = (path) => { try { return diffPositions(git("diff", "-U3", `${target}...${fullSha}`, "--", path)); } catch { return new Map(); } };
+// GitLab keeps every pushed version of an MR's diff. The one whose head is the commit this
+// brief describes pins the link, and its merge base is what GitLab numbers the old side
+// against. Not found (the commit is not pushed yet, or no CLI) → an unpinned link, said so.
+let version = null;
+if (mr && !github) {
+  try { version = (api(r, `projects/${r.enc}/merge_requests/${mr}/versions`) || []).find((v) => v.head_commit_sha === fullSha) || null; } catch { version = null; }
+  if (!version) console.error(`note: no pushed version of !${mr} has head ${fullSha.slice(0, 9)} — links are not pinned and will follow later pushes`);
+}
+const diffBase = (() => {
+  if (version) { try { git("cat-file", "-e", `${version.base_commit_sha}^{commit}`); return version.base_commit_sha; } catch {} }
+  return git("merge-base", target, fullSha).trim();
+})();
+
+const positions = (path) => { try { return diffPositions(git("diff", "-U3", diffBase, fullSha, "--", path)); } catch { return new Map(); } };
 
 const out = [];
 let failed = false;
@@ -85,7 +90,7 @@ for (const t of targets) {
   let url = permalink, where = "blob";
   if (mr) {
     const pos = positions(path);
-    if (pos.has(line)) { url = diffUrl({ base, github, mr, path, line, oldLine: pos.get(line) }); where = "diff"; }
+    if (pos.has(line)) { url = diffUrl({ base, github, mr, path, line, oldLine: pos.get(line), diffId: version?.id }); where = "diff"; }
     else where = "blob (line not in the MR diff — no place to comment on it)";
   }
   out.push({

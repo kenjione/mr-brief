@@ -111,7 +111,20 @@ A description appearing under your name that you did not ask for is a failure, h
 - The offer fires from a hook on the command that opens the MR — once per branch, recorded in `.git/`.
 - **No** is final for that branch. **Yes** writes the brief into the conversation; attaching it to the MR takes a second yes.
 - `touch ~/.claude/.mr-brief-always` to skip the question. Attaching still asks.
+- After a push past the commit the brief describes, a second hook asks one line: *refresh it?* GitLab links stay pinned to the version they were written for, so an old brief never sends a reader to the wrong line.
 - Prefer `/mr-brief` only? Delete `hooks/hooks.json` after install.
+
+## Before anyone reads it
+
+Every key change and risk goes to a second reader before you see the brief: a separate agent with none of the writer's context reads the code behind each claim, library sources included, and answers *supported*, *contradicted* or *unsupported*. What it cannot back is rewritten or dropped. The reading guide is built by a smaller-model agent, so a large MR does not cost the writer's budget file by file.
+
+## Reviewing an MR that has no brief
+
+`/mr-brief review 2710` fetches someone else's MR without touching your checkout and writes the same reading guide for you, with three questions to settle instead of key changes. It stays on your machine: nothing is attached, uploaded or posted.
+
+## Is it working?
+
+`node scripts/metrics.mjs --days 30` lines up merged MRs with and without a brief: hours to the first review comment, review comments per MR, MRs merged with no review comment at all, and how many *Where to look* boxes reviewers ticked. Read-only. On the repo it was first run on, 35 of 38 MRs in a month were merged without a single review comment — that is the number to move.
 
 ## Runtimes
 
@@ -151,8 +164,15 @@ skills/mr-brief/SKILL.md          the rules
 skills/mr-brief/reference/        how and when to draw
 hooks/offer.mjs                   the once-per-branch offer
 hooks/update-check.mjs            once a day, tells you when a newer version is published
+hooks/stale.mjs                   after a push, says when the MR's brief describes an older commit
+agents/claim-checker.md           the second reader: every claim checked against the code
+agents/reading-guide.md           builds the reading guide on a smaller model
 scripts/anchor.mjs                path:line → a link into the MR's diff at that line (or a permalink), refuses a line that does not exist
-scripts/lint.mjs                  checks a brief against the contract
+scripts/lint.mjs                  checks a brief against the contract; --head says whether it is stale
+scripts/attach.mjs                puts the brief on the MR, stamped with the commit it describes
+scripts/claims.mjs                the packet the claim-checker reads: claims + the code behind every link
+scripts/mr-ref.mjs                someone else's MR as refs, for review mode — no checkout
+scripts/metrics.mjs               merged MRs with and without a brief, side by side
 scripts/siblings.mjs              open MRs sharing the branch's ticket key (GitLab)
 scripts/focus.mjs                 sorts the diff into read-closely / skip, names the renames
 scripts/preview.mjs               the brief as the MR page will show it — platform renderer + mermaid, both themes
@@ -160,7 +180,7 @@ scripts/excerpt.mjs               the decisive hunk of a file as a diff block, t
 scripts/render.mjs                draws both pictures with the PR Lens renderer and uploads them to the MR (GitLab)
 scripts/compile.mjs               the same graph document as mermaid — the model never writes mermaid by hand
 templates/                        the empty shape for GitLab and GitHub — usable with no agent at all
-ci/                               drop-in jobs that lint a description and comment, never block
+ci/                               drop-in jobs that lint a description, flag a stale one, and comment — never block
 evals/                            lint fixtures, a real-run harness, a rubric
 ```
 
