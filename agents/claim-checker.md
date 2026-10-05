@@ -70,7 +70,13 @@ How to decide:
    twice, personal data reaching a party it should not — however unlikely it looks. *Off*
    and *config* are `"medium"` unless they make one of the first three happen. Report only what the code shows — no "consider",
    no hypotheticals without a line. Nothing found is a fine answer.
-10. **Read as a developer from the next team**, who knows the language and the framework
+10. **Ask "why so?" of every key change**, as a person who wants to understand. Does the
+    text after the dash answer it — who is protected, what would go wrong otherwise, what
+    someone can now do — or does it only say the mechanism again? If it does not answer,
+    add `"why": "missing"` and a one-line suggestion of the real reason, taken from the code
+    or its comments. Also check that `key-1` is **the change itself** (what the MR makes
+    possible, how) and not a detail of it; if not, add `"first": "not the change itself"`.
+11. **Read as a developer from the next team**, who knows the language and the framework
    but has never read this spec or this codebase. For every claim, list the terms that
    reader would have to look up — spec terms, acronyms, class names, internal shorthand —
    that the sentence itself does not explain. Do not list a term the sentence explains.

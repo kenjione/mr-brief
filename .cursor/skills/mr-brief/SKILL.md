@@ -76,7 +76,7 @@ is attached, posted, uploaded or commented, and the checkout never moves.
 | Why | `**Why:**` 1–2 sentences, 280 chars: the need or the problem — what someone could not do, or what went wrong, before this MR |
 | Architecture | 1 line + the scenario as a sequence across services, only if a service now calls another it did not, or the MR is one of a set |
 | Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there; the mermaid form always under `<details>` |
-| Key changes | `###` heading; exactly **3** bullets, `**claim** — reason`, most contentious first |
+| Key changes | `###` heading; exactly **3** bullets, `**what** — why`. The first is **the change itself**: what the MR makes possible and how. Then the two most arguable decisions. Every *why* answers the reader's "why so?" |
 | Where to look | `###` heading carrying `~N min` and `skip:`; a **`**Start →**` line** — where the scenario is entered — then exactly **3** checkboxes, each a **question the reviewer answers at a line this MR changed**, ending `· key change N` — one for each key change |
 | Risk | `###` heading; the only blockquote: the worst one or two realistic risks — including any **high** one the claim-checker found that the brief left out — then the rollback |
 
@@ -251,6 +251,9 @@ flow does not do that.
    - **contradicted** → rewrite the claim to what the code does, or drop it. Never argue it back.
    - **unsupported** → add the anchor that settles it and re-check, or soften it to what you
      can show, or drop it.
+   - **why** it marks *missing* for a key change → the text after the dash restates how, not
+     why. Rewrite it as the answer to "why so?" — who it protects, what would go wrong
+     otherwise. If it marks key change 1 as *not the change itself*, reorder or rewrite.
    - **jargon** it lists for a claim → say in the same sentence what the term means in
      everyday words, or replace it. The checker reads as a developer from the next team.
    - **check_at / question** it gives for a key change → when it differs from your place to
@@ -294,6 +297,9 @@ something the new commits changed.
 
 Write it the way you would say it to a colleague at their desk.
 
+- **Every claim answers "why so?"** The reader is a person who wants to understand, not a
+  parser checking facts. A sentence that says what happens and not why it matters leaves
+  them guessing — and guessing is how a reviewer stops reading.
 - **One idea per sentence.** No semicolon stacking a second thought onto a first, no
   clause starting with "which".
 - **The everyday word wins**: *dead* over *deactivated*, *stolen* over *captured*,
@@ -333,9 +339,23 @@ Write it the way you would say it to a colleague at their desk.
   `billing gains a nightly sweep worker and now asks the provider whether a subscription is still live.`
   Key changes say what was decided; the flow says what happens; this says what now
   exists that did not. Absent when the shape did not change — say so only in a series.
-- **Key changes** — each a decision someone could disagree with. If nobody could, delete
-  it. Bad: `Added PollSubscriptionsWorker`. Good: `**The sweep is fail-soft per row** — one
-  unreachable provider no longer aborts the rest`.
+- **Key changes** — the reader of every bullet asks one question: **why so?** The text
+  after the dash is the answer, in terms of a person or a consequence — who is protected,
+  what would go wrong otherwise, what someone can now do. Not the mechanism said again.
+  If, after reading your answer, they would still ask "why?", go one level deeper.
+  **The first bullet is the change itself** — for a feature, what it makes possible and how
+  it works at the step that matters; for a fix, what was broken and what now holds. Then
+  the two decisions most worth arguing about. Read only the bold, top to bottom: it should
+  tell the story the lead started.
+  Bad: `**Signing codes bypass the account login path** — a separate code type with no
+  account behind it, so PKCE is always required` (a detail of step 8 of the flow, first;
+  the feature is nowhere; "why bypass?" is never answered)
+  Good: `**The Signer approves in their wallet, and we check the "yes" is for exactly these
+  documents** — otherwise a "yes" to one contract could be used to sign another`
+  Bad: `Added PollSubscriptionsWorker`. Good: `**The sweep is fail-soft per row** — one
+  unreachable provider no longer stops everyone else's add-ons from being cancelled`.
+  Each must still be a decision someone could disagree with, the first included: *we
+  check it ourselves* is a decision too.
   **Each reason must be checkable in thirty seconds at one of the three places to look.**
   A claim the reviewer cannot verify from the links you gave them is a "trust me", and a
   brief has no room for those. If a claim needs a fourth place, the claim or the place is
@@ -389,6 +409,8 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] No mermaid was typed: any block came out of `compile.mjs`, sits under `<details>`, and only because there is no SVG
 - [ ] Every arrow in it exists in the code
 - [ ] The lead says who can now do what, and `**Why:**` says what could not be done before — both readable without the spec
+- [ ] The first key change is the change itself, and the bold of the three reads as the story of the MR
+- [ ] After each dash there is an answer to "why so?" in terms of a person or a consequence — not the mechanism again
 - [ ] Every **high** finding the checker marked *omitted* is in Risk, the rest are under Open questions
 - [ ] Every key change and risk came back **supported** from the claim-checker, or was rewritten until it did, and no term it flagged is left unexplained
 - [ ] It was attached with `attach.mjs`, so line one names the commit it describes

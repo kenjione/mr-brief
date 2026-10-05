@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.5
+- **Every key change answers "why so?"** The text after the dash is the reason in human terms — who is protected, what would go wrong otherwise — not the mechanism again. The first key change is the change itself, and the bold of the three reads as the story of the MR. The claim-checker asks "why so?" of each one and flags an answer that only says *how*, or a first bullet that is a detail. A test brief led with "signing codes bypass the login path" on an MR whose point was signature approval.
+
 ## 0.9.4
 - **The checker hunts what the brief leaves out.** After the claims, the claim-checker reads the diff against five questions — who (is the actor the one expected?), twice (can a once-only step happen twice?), who sees (does data reach someone it should not?), off (does the rollback stop it?), config (are new settings declared?) — and reports each finding with its line and a severity. A high one goes into Risk; the rest go to Open questions in the reading guide. A brief can be true in every sentence and still hide the thing that matters; on the test MR, nobody checked who was signing.
 
