@@ -118,7 +118,7 @@ A description appearing under your name that you did not ask for is a failure, h
 
 ## Before anyone reads it
 
-Every key change and risk goes to a second reader before you see the brief: a separate agent with none of the writer's context reads the code behind each claim, library sources included, and answers *supported*, *contradicted* or *unsupported*. What it cannot back is rewritten or dropped. The reading guide is built by a smaller-model agent, so a large MR does not cost the writer's budget file by file.
+Every key change and risk goes to a second reader before you see the brief: a separate agent with none of the writer's context reads the code behind each claim, library sources included, and answers *supported*, *contradicted* or *unsupported*. What it cannot back is rewritten or dropped. Then it reads the diff for what the brief left out — who is acting, what can happen twice, who gets to see what, whether the off-switch works — and the worst of it goes into Risk. The reading guide is built by a smaller-model agent, so a large MR does not cost the writer's budget file by file.
 
 ## Reviewing an MR that has no brief
 

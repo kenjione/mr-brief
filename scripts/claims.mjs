@@ -67,6 +67,7 @@ const packet = [
   "(nothing here or in the code you read settles it). Cite `path:line` for every verdict.",
   "For every claim, also list the terms a developer from the next team — who knows the language,",
   "not this spec or this codebase — would have to look up, and that the sentence does not explain.",
+  "Then read the diff yourself and report what the brief leaves out: who, twice, who sees, off, config.",
   "",
   "## Claims",
   "",

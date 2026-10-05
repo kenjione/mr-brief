@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.4
+- **The checker hunts what the brief leaves out.** After the claims, the claim-checker reads the diff against five questions — who (is the actor the one expected?), twice (can a once-only step happen twice?), who sees (does data reach someone it should not?), off (does the rollback stop it?), config (are new settings declared?) — and reports each finding with its line and a severity. A high one goes into Risk; the rest go to Open questions in the reading guide. A brief can be true in every sentence and still hide the thing that matters; on the test MR, nobody checked who was signing.
+
 ## 0.9.3
 - **Where to look starts at the door.** A `**Start →**` line of its own above the three questions: where the scenario the MR adds is entered — the new route, the new branch in an entry point, the job — and what to follow down. 0.9.2 had folded the start into the first question, which pointed into the middle of the flow. Lint requires the line; the claim-checker names its own door to compare.
 

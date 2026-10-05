@@ -78,7 +78,7 @@ is attached, posted, uploaded or commented, and the checkout never moves.
 | Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there; the mermaid form always under `<details>` |
 | Key changes | `###` heading; exactly **3** bullets, `**claim** — reason`, most contentious first |
 | Where to look | `###` heading carrying `~N min` and `skip:`; a **`**Start →**` line** — where the scenario is entered — then exactly **3** checkboxes, each a **question the reviewer answers at a line this MR changed**, ending `· key change N` — one for each key change |
-| Risk | `###` heading; 1–2 lines, the only blockquote |
+| Risk | `###` heading; the only blockquote: the worst one or two realistic risks — including any **high** one the claim-checker found that the brief left out — then the rollback |
 
 If the change does not fit in three claims, say so before writing: *"this is N separable
 changes — split it, or the reviewer skims."* Write it if they decline, but say it once.
@@ -256,6 +256,13 @@ flow does not do that.
    - **check_at / question** it gives for a key change → when it differs from your place to
      look for that claim, take the checker's line and question unless yours is sharper; re-run
      `anchor.mjs` for the new line.
+   - **omitted** — what the brief left out, found by asking who, twice, who sees, off and
+     config of the diff. A **high** one goes into Risk, in one plain sentence on what can
+     happen and to whom: it is exactly what a reviewer must not miss, and the reason this
+     check exists. If there are more than two, Risk names the worst two and the reading guide
+     lists the rest under **Open questions**, each with its line. A **medium** one goes to
+     Open questions. Never drop one because it makes the MR look worse — the author reads the
+     brief before anyone else, and can fix it first.
    Then lint again, and tell the author in one line per changed claim what the checker found.
    No subagents in this runtime → read `claims.md` cold, as if someone else wrote the brief,
    and apply the same three verdicts.
@@ -354,6 +361,9 @@ Write it the way you would say it to a colleague at their desk.
   MR than any bullet adds. `anchor.mjs` says when a line is context the MR did not change —
   then the decision is somewhere else.
 - **Risk** — worst *realistic* outcome; loud or silent; then revert-and-done or what more.
+  Not the risk you already knew while writing: the worst one in the diff, which is often the
+  one the checker found. *Anyone who scans the QR can sign, and the service is never told
+  who it expected* beats *the provisioner is still a stub*. Say who it happens to.
 - **`<details>`** — `<summary>` on its own line, blank line before and after the Markdown
   inside, or it renders as raw text. A bare `Details` summary renders as a footnote nobody
   opens: put a `---` rule above the block and make the summary **say what is inside** —
@@ -379,6 +389,7 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] No mermaid was typed: any block came out of `compile.mjs`, sits under `<details>`, and only because there is no SVG
 - [ ] Every arrow in it exists in the code
 - [ ] The lead says who can now do what, and `**Why:**` says what could not be done before — both readable without the spec
+- [ ] Every **high** finding the checker marked *omitted* is in Risk, the rest are under Open questions
 - [ ] Every key change and risk came back **supported** from the claim-checker, or was rewritten until it did, and no term it flagged is left unexplained
 - [ ] It was attached with `attach.mjs`, so line one names the commit it describes
 - [ ] Nothing was attached without a second yes, and nothing was posted as a comment or thread; the reading guide covers each core file once, hunks cut by `excerpt.mjs`, none for a rename

@@ -45,7 +45,32 @@ How to decide:
    the first line whose caller this MR did not write. Add one entry with id `start`,
    `check_at` set to that line, and a note on what to follow down. If the brief's **Start →**
    points elsewhere, say so.
-9. **Read as a developer from the next team**, who knows the language and the framework
+9. **Hunt what the brief leaves out.** A brief can be true in every sentence and still hide
+   the thing that matters. After the claims, read the diff itself (`git diff <base> <head>`,
+   the core files first) and ask these five questions of the change — each against the code,
+   never from the brief:
+   - **Who.** Does it check that the actor is the one the caller expects — the user, the
+     account, the signer, the owner of the id it was handed — or only that *someone* valid
+     showed up? Two shapes to look for: an id taken from the request and never matched to
+     the party that authenticated; and a flow where the caller **cannot even say** whom it
+     expects, so whoever completes it first is accepted. The second is a finding even when
+     every line is correct: say who can end up acting in someone else's place.
+   - **Twice.** Can a step that must happen once happen twice — a code, a token, a payment,
+     an approval — through a retry, a replay, or two calls at the same moment? Find-then-
+     delete without a lock or an atomic write is the usual shape.
+   - **Who sees.** Does data reach someone who should not read it — personal data in a
+     token, a log line, an error message, a response to a third party? Signed is not secret.
+   - **Off.** Does the rollback or the feature flag actually stop it, everywhere it runs?
+   - **Config.** Does it read settings, keys or env vars that are not declared where this
+     codebase declares them?
+   For each real finding add one entry: id `omit-1`, `omit-2` …, `"verdict": "omitted"`,
+   `check_at` the line that shows it, and a `note` in one plain sentence that says what can
+   happen and to whom. **Severity is set by the question, not by feel:** a finding under
+   *who*, *twice* or *who sees* is `"high"` — the wrong person acting, a once-only thing used
+   twice, personal data reaching a party it should not — however unlikely it looks. *Off*
+   and *config* are `"medium"` unless they make one of the first three happen. Report only what the code shows — no "consider",
+   no hypotheticals without a line. Nothing found is a fine answer.
+10. **Read as a developer from the next team**, who knows the language and the framework
    but has never read this spec or this codebase. For every claim, list the terms that
    reader would have to look up — spec terms, acronyms, class names, internal shorthand —
    that the sentence itself does not explain. Do not list a term the sentence explains.
