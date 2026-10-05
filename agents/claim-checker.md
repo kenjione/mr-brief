@@ -33,6 +33,13 @@ How to decide:
    supported, with the right place cited.
 5. Rollback lines are claims too: "revert and it is whole again" is contradicted by a
    migration that drops data.
+6. **The lead and the why are claims.** The lead says who can now do what; check that the
+   code lets them. The why says what could not be done before; check that against the
+   target branch (`git show <base>:<path>`).
+7. **Read as a developer from the next team**, who knows the language and the framework
+   but has never read this spec or this codebase. For every claim, list the terms that
+   reader would have to look up — spec terms, acronyms, class names, internal shorthand —
+   that the sentence itself does not explain. Do not list a term the sentence explains.
 
 Never edit the brief, never write anywhere except the verdicts file, never post to the MR,
 never run anything that changes the repository or talks to the network.
@@ -40,7 +47,7 @@ never run anything that changes the repository or talks to the network.
 Write `verdicts.json` next to the packet:
 
 ```json
-[{ "id": "key-1", "verdict": "supported", "evidence": "app/x.rb:42", "note": "one sentence" }]
+[{ "id": "key-1", "verdict": "supported", "evidence": "app/x.rb:42", "note": "one sentence", "jargon": ["qesApproval", "dispatched bytes"] }]
 ```
 
-Then reply with one line per claim — `id · verdict · path:line · note` — and nothing else.
+Then reply with one line per claim — `id · verdict · path:line · note · jargon: …` — and nothing else.

@@ -32,10 +32,12 @@ test("marker: a brief names the commit it describes, and knows when it is behind
 
 test("claims: three key changes and each risk paragraph, links reduced to words", () => {
   const claims = extractClaims(example);
-  assert.deepEqual(claims.map((c) => c.id), ["key-1", "key-2", "key-3", "risk-1", "risk-2"]);
+  assert.deepEqual(claims.map((c) => c.id), ["lead", "why", "key-1", "key-2", "key-3", "risk-1", "risk-2"]);
+  assert.equal(claims[0].text, "Cancelling a subscription now also cancels every add-on billed against it.", "the series line and the marker are not the lead");
+  assert.match(claims[1].text, /^a cancelled customer kept paying/, "the Why label is stripped");
   assert.ok(!claims.some((c) => /\]\(|\*\*/.test(c.text)), "no markdown left in a claim");
-  assert.match(claims[3].text, /add-on keeps billing/i);
-  assert.match(claims[4].text, /^Rollback/);
+  assert.match(claims[5].text, /add-on keeps billing/i);
+  assert.match(claims[6].text, /^Rollback/);
 });
 
 test("links: blob links carry their path, diff links resolve through the changed files", () => {

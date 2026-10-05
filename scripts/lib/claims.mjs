@@ -5,6 +5,11 @@
 export function extractClaims(text) {
   const lines = String(text).split("\n");
   const claims = [];
+  // The lead: the first prose line after the marker that is not a series line, a label or a picture.
+  const lead = lines.slice(1).find((l) => l.trim() && !/^(\*\*|!\[|<|#|>|-|```|\*[^*])/.test(l.trim()));
+  if (lead) claims.push({ id: "lead", kind: "lead", text: plain(lead) });
+  const why = lines.find((l) => /^\*\*Why:\*\*/.test(l.trim()));
+  if (why) claims.push({ id: "why", kind: "why", text: plain(why.replace(/^\s*\*\*Why:\*\*\s*/, "")) });
   const section = (name) => lines.findIndex((l) => new RegExp(`^###\\s+${name}\\b`, "i").test(l.trim()));
   const kc = section("Key changes");
   if (kc >= 0) {

@@ -2,6 +2,8 @@
 
 Deactivated subscriptions no longer come back from the lookup the payments service uses.
 
+**Why:** the payments service charged a subscription that had been deactivated, because the lookup still returned it.
+
 ### Key changes
 - **The lookup asks only for active subscriptions** — a dead one resolves to nothing instead of being served
 - **`blocked` is its own field** — a subscription can be paid up and blocked at once

@@ -65,6 +65,8 @@ const packet = [
   "Each claim below is a sentence a reviewer will believe without opening the code. Decide each one:",
   "**supported** (the code shows it), **contradicted** (the code shows otherwise), or **unsupported**",
   "(nothing here or in the code you read settles it). Cite `path:line` for every verdict.",
+  "For every claim, also list the terms a developer from the next team — who knows the language,",
+  "not this spec or this codebase — would have to look up, and that the sentence does not explain.",
   "",
   "## Claims",
   "",

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1
+- **A brief says what the MR is for.** A required `**Why:**` line under the lead: the need or the problem, what could not be done or went wrong before. The lead now says who can now do what, not the state of the code.
+- **No term without its meaning.** A spec term, acronym or class name appears only with its everyday meaning in the same sentence. The claim-checker reads as a developer from the next team and lists every term that reader would have to look up; the lead and the why are checked like any other claim.
+
 ## 0.9.0
 - **Links stay put.** GitLab diff links are pinned to the MR version the brief was written for (`diffs?diff_id=…`), so a later push cannot move the line under the reader. GitHub has no such pin; there the stale check below is the guard.
 - **A brief knows which commit it describes.** `attach.mjs` stamps `head=<sha>` on line one, refuses a brief that fails lint, and records the MR. A PostToolUse hook says, once per pushed commit, when the branch has moved past the brief; `lint.mjs --head` and both CI jobs report it too.

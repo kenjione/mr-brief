@@ -54,7 +54,19 @@ if (lead.length > 140) fail.push(`opening sentence is ${lead.length} chars; the 
 const banned = /^(this (mr|pr|change|commit)\b|in this (change|mr|pr)\b|as part of\b|refactor(ed|s)?\b|various improvements|minor fixes|added?\b|updated?\b)/i;
 if (banned.test(lead)) fail.push(`opening sentence starts with a banned opener: "${lead.split(/\s+/).slice(0, 3).join(" ")}…"`);
 
+// ---- why: the need or the problem, right after the lead
+const whyAt = lines.findIndex((l) => /^\*\*Why:\*\*/.test(l.trim()));
+if (whyAt < 0) fail.push("missing **Why:** — one or two sentences on the need or the problem this MR answers");
+else {
+  const why = lines[whyAt].trim().replace(/^\*\*Why:\*\*\s*/, "");
+  if (!why) fail.push("**Why:** is present but empty");
+  if (why.length > 280) fail.push(`**Why:** is ${why.length} chars; the limit is 280`);
+  if (text[0] && text[0].i === whyAt) fail.push("**Why:** comes after the lead sentence, not before it");
+}
+
 // ---- key changes: exactly 3 bold-claim bullets between the two headings
+const kcStartForWhy = lines.findIndex((l) => /^(###\s+|\*\*)Key changes(\*\*)?/.test(l.trim()));
+if (whyAt >= 0 && kcStartForWhy >= 0 && whyAt > kcStartForWhy) fail.push("**Why:** must sit above Key changes, under the lead");
 const kcStart = lines.findIndex((l) => /^(###\s+|\*\*)Key changes(\*\*)?/.test(l.trim()));
 const wlStart = lines.findIndex((l) => /^(###\s+|\*\*)Where to look(\*\*)?/.test(l.trim()));
 if (kcStart < 0) fail.push("missing ### Key changes heading");

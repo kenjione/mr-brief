@@ -94,6 +94,7 @@ Every link was checked against the commit before it was written, and on an open 
 | | |
 |---|---|
 | **15 lines** of text, hard limit | the diagram does not count |
+| **Why** | one or two sentences on the need or the problem, readable without the spec |
 | **3** key changes | each a decision someone could disagree with, most contentious first |
 | **3** places to look | verified links into the MR's changes tab, caller before callee, with a minutes estimate and a `skip:` |
 | **1** risk line | worst realistic outcome, loud or silent, how to roll back |

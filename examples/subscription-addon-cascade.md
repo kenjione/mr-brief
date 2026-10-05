@@ -2,6 +2,8 @@
 
 Cancelling a subscription now also cancels every add-on billed against it.
 
+**Why:** a cancelled customer kept paying for add-ons, because nothing told the payments side the subscription had ended.
+
 **Architecture:** billing now calls the payments API for the first time, from a nightly sweep. Nothing removed.
 
 <details>

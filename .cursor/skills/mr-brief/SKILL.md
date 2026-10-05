@@ -72,7 +72,8 @@ is attached, posted, uploaded or commented, and the checkout never moves.
 | Element | Limit |
 |---|---|
 | Series line | 1 line, only when the MR is one of a set |
-| What changes | 1 sentence, 140 chars |
+| What changes | 1 sentence, 140 chars: **who can now do what**, in words a developer from the next team understands |
+| Why | `**Why:**` 1–2 sentences, 280 chars: the need or the problem — what someone could not do, or what went wrong, before this MR |
 | Architecture | 1 line + the scenario as a sequence across services, only if a service now calls another it did not, or the MR is one of a set |
 | Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there; the mermaid form always under `<details>` |
 | Key changes | `###` heading; exactly **3** bullets, `**claim** — reason`, most contentious first |
@@ -87,7 +88,9 @@ changes — split it, or the reviewer skims."* Write it if they decline, but say
 ```markdown
 <!-- mr-brief v1 -->  TICKET · 2 of 3 · after repo_a!11, before repo_c!33
 
-One sentence saying what is now true that was not before.
+One sentence: who can now do what, in everyday words.
+
+**Why:** the need or the problem behind it — what could not be done, or what went wrong, before.
 
 **Architecture:** one line on what now talks to what that did not before. Then its picture.
 
@@ -247,6 +250,8 @@ flow does not do that.
    - **contradicted** → rewrite the claim to what the code does, or drop it. Never argue it back.
    - **unsupported** → add the anchor that settles it and re-check, or soften it to what you
      can show, or drop it.
+   - **jargon** it lists for a claim → say in the same sentence what the term means in
+     everyday words, or replace it. The checker reads as a developer from the next team.
    Then lint again, and tell the author in one line per changed claim what the checker found.
    No subagents in this runtime → read `claims.md` cold, as if someone else wrote the brief,
    and apply the same three verdicts.
@@ -282,9 +287,12 @@ Write it the way you would say it to a colleague at their desk.
   clause starting with "which".
 - **The everyday word wins**: *dead* over *deactivated*, *stolen* over *captured*,
   *asks for* over *declares*.
-- **A term the reader would look up gets one line of plain English, or it goes.** Domain
-  words are fine when the change is about them; a word that lives only inside one class
-  is the author's shorthand.
+- **No term without its meaning.** A spec term (`qesApproval`, `transaction_data`, `DPoP`),
+  an acronym or a class name appears only in a sentence that also says what it is in
+  everyday words — *the wallet's signed "yes" (`qesApproval`)* — or not at all. That the
+  change is about the term is no excuse: that is exactly when the reviewer needs to know
+  what it means. The test: a developer from the next team, who has never read this spec,
+  understands the lead, the why and every bold claim.
 - **Active voice, present tense.** "The sweep skips", not "will be skipped".
 - **No claim the diff does not contain.** No "faster" without a number.
 - **A claim about what a library or framework does is read in its source, not remembered.**
@@ -297,9 +305,19 @@ Write it the way you would say it to a colleague at their desk.
 
 ## Each part
 
-- **What changes** — behaviour, not mechanics. Subject first, active verb.
+- **What changes** — what a person or a service can now do, or what now happens to
+  them. Not the state of the code. Subject first, active verb.
   Bad: `This MR introduces a new worker and refactors the subscription model.`
-  Good: `Cancelling a subscription now also cancels every add-on billed against it.`
+  Bad: `A presentation whose qesApproval misses the dispatched bytes fails.` (true, and
+  unreadable to anyone who has not read the spec)
+  Good: `A service can now ask a user to sign documents from their phone wallet, and gets a
+  token only for the documents the user saw and approved.`
+- **Why** — the reason this MR exists, before anything about how. For a feature, the
+  scenario: who needs what. For a fix, what broke and who noticed. It is the line a
+  reviewer uses to judge every decision below: *does this serve that?*
+  Bad: `**Why:** CS-03 §7.3 compliance.`
+  Good: `**Why:** a signature must be for the document the user saw. Until now nothing
+  checked that the wallet's approval was for the documents we sent.`
 - **Architecture** — what now talks to what that did not before, in one line:
   `billing gains a nightly sweep worker and now asks the provider whether a subscription is still live.`
   Key changes say what was decided; the flow says what happens; this says what now
@@ -339,6 +357,7 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] Each picture passes its gate, is drawn at the level of the headline change, and was drawn by this run — not carried over
 - [ ] No mermaid was typed: any block came out of `compile.mjs`, sits under `<details>`, and only because there is no SVG
 - [ ] Every arrow in it exists in the code
-- [ ] Every key change and risk came back **supported** from the claim-checker, or was rewritten until it did
+- [ ] The lead says who can now do what, and `**Why:**` says what could not be done before — both readable without the spec
+- [ ] Every key change and risk came back **supported** from the claim-checker, or was rewritten until it did, and no term it flagged is left unexplained
 - [ ] It was attached with `attach.mjs`, so line one names the commit it describes
 - [ ] Nothing was attached without a second yes, and nothing was posted as a comment or thread; the reading guide covers each core file once, hunks cut by `excerpt.mjs`, none for a rename

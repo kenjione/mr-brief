@@ -1,6 +1,8 @@
 <!-- mr-brief v1 -->  <!-- TICKET · 2 of 3 · after repo_a!11, before repo_c!33 — delete unless this MR is one of a set -->
 
-<!-- One sentence, max 140 chars: what is now true that was not before. Not "This MR ...". -->
+<!-- One sentence, max 140 chars: who can now do what, in words a developer from the next team understands. Not "This MR ...". -->
+
+**Why:** <!-- 1–2 sentences: the need or the problem — what could not be done, or what went wrong, before. No spec terms without their meaning. -->
 
 <!-- Architecture: ONE line, only if a component, a dependency between services or a table
      was added, removed or moved — then a picture of the components and their arrows.
