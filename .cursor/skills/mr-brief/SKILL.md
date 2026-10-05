@@ -77,7 +77,7 @@ is attached, posted, uploaded or commented, and the checkout never moves.
 | Architecture | 1 line + the scenario as a sequence across services, only if a service now calls another it did not, or the MR is one of a set |
 | Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there; the mermaid form always under `<details>` |
 | Key changes | `###` heading; exactly **3** bullets, `**claim** — reason`, most contentious first |
-| Where to look | `###` heading carrying `~N min` and `skip:`; exactly **3** verified links as checkboxes, in reading order — into the MR's changes tab when the MR exists |
+| Where to look | `###` heading carrying `~N min` and `skip:`; exactly **3** links as checkboxes, in reading order. Each is a **question the reviewer answers at a line this MR changed**, ending `· key change N` — one for each key change |
 | Risk | `###` heading; 1–2 lines, the only blockquote |
 
 If the change does not fit in three claims, say so before writing: *"this is N separable
@@ -112,9 +112,9 @@ sequenceDiagram ...       %% compiled from graph.json — never typed
 - **The third** — its reason
 
 ### Where to look · ~12 min · skip the 890 lines of specs
-- [ ] **Start →** [file.rb:21](…/diffs#…_21) — the entry point, top to bottom
-- [ ] [other.rb:103](…/diffs#…_103) — the decision most worth arguing about
-- [ ] [spec.rb:92](…/diffs#…_92) — the test that proves the interesting case
+- [ ] **Start →** [file.rb:21](…/diffs#…_21) — is X compared with what we sent, not with what came back? · key change 1
+- [ ] [other.rb:103](…/diffs#…_103) — can two calls both get past this before either writes? · key change 3
+- [ ] [spec.rb:92](…/diffs#…_92) — does the failing case leave the rest running? · key change 2
 
 ### Risk
 > The worst realistic outcome, and whether it fails loudly or silently.
@@ -252,6 +252,9 @@ flow does not do that.
      can show, or drop it.
    - **jargon** it lists for a claim → say in the same sentence what the term means in
      everyday words, or replace it. The checker reads as a developer from the next team.
+   - **check_at / question** it gives for a key change → when it differs from your place to
+     look for that claim, take the checker's line and question unless yours is sharper; re-run
+     `anchor.mjs` for the new line.
    Then lint again, and tell the author in one line per changed claim what the checker found.
    No subagents in this runtime → read `claims.md` cold, as if someone else wrote the brief,
    and apply the same three verdicts.
@@ -329,10 +332,21 @@ Write it the way you would say it to a colleague at their desk.
   A claim the reviewer cannot verify from the links you gave them is a "trust me", and a
   brief has no room for those. If a claim needs a fourth place, the claim or the place is
   wrong.
-- **Where to look** — the entry point, the riskiest decision, the test that proves the
-  interesting case. One link per entry; a second link smuggled into the first entry is a
-  fourth place to look. `**Start →**` on the first. `~N min` and one `skip:` clause in the
-  heading: naming what *not* to read removes more work on a 70-file MR than any bullet adds.
+- **Where to look** — where each key change can be **proven wrong**, not where the code
+  starts. For each key change, the one line *this MR changed* where its decision is made —
+  the comparison, the guard, the write, the missing lock — not the caller, not a comment,
+  not a line of context. Then the entry is the **question the reviewer answers there**,
+  and its tag says which claim it checks:
+  Bad: `[wallet_answer.rb:207] — where a verified answer becomes an approval`
+  (names a place; the reviewer still does not know what to look for)
+  Good: `[wallet_answer.rb:207] — is the wallet's "yes" compared with exactly the
+  bytes we sent, and does an answer with no "yes" fail too? · key change 1`
+  Ask what would make the claim false — the edge case, the concurrent call, the missing
+  branch. A question whose answer is visibly "yes" in the hunk is a wasted place. Order the
+  three in reading order; `**Start →**` on the first. One link per entry. `~N min` and one
+  `skip:` clause in the heading: naming what *not* to read removes more work on a 70-file
+  MR than any bullet adds. `anchor.mjs` says when a line is context the MR did not change —
+  then the decision is somewhere else.
 - **Risk** — worst *realistic* outcome; loud or silent; then revert-and-done or what more.
 - **`<details>`** — `<summary>` on its own line, blank line before and after the Markdown
   inside, or it renders as raw text. A bare `Details` summary renders as a footnote nobody
@@ -353,7 +367,7 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] The author said yes, or invoked the skill themselves
 - [ ] Every anchor came from `anchor.mjs` with `--mr` when the MR exists, and the printed line is the line you meant
 - [ ] Every key change can be checked at one of the three anchors in thirty seconds
-- [ ] The first anchor is the caller, not something it calls
+- [ ] Each place to look is a question, on a line this MR changed, tagged with the key change it checks — the three tags cover all three
 - [ ] Each picture passes its gate, is drawn at the level of the headline change, and was drawn by this run — not carried over
 - [ ] No mermaid was typed: any block came out of `compile.mjs`, sits under `<details>`, and only because there is no SVG
 - [ ] Every arrow in it exists in the code

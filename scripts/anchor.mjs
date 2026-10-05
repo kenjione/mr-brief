@@ -90,11 +90,14 @@ for (const t of targets) {
   let url = permalink, where = "blob";
   if (mr) {
     const pos = positions(path);
-    if (pos.has(line)) { url = diffUrl({ base, github, mr, path, line, oldLine: pos.get(line), diffId: version?.id }); where = "diff"; }
+    if (pos.has(line)) {
+      url = diffUrl({ base, github, mr, path, line, oldLine: pos.get(line), diffId: version?.id });
+      where = pos.added.has(line) ? "diff" : "diff (context line — this MR did not change it; is the decision really here?)";
+    }
     else where = "blob (line not in the MR diff — no place to comment on it)";
   }
   out.push({
-    input: t, path, line, url, permalink, where,
+    input: t, path, line, url, permalink, where, changed: where === "diff",
     markdown: `[${basename(path)}:${line}](${url})`,
     text: lines[line - 1],
   });
@@ -107,7 +110,7 @@ if (json) {
     if (a.error) { console.log(`✗ ${a.input} — ${a.error}`); continue; }
     console.log(a.markdown);
     console.log(`    ${String(a.line).padStart(5)} | ${a.text}`);
-    if (mr && a.where !== "diff") console.log(`          ↳ ${a.where}`);
+    if (a.where && a.where !== "diff" && a.where !== "blob") console.log(`          ↳ ${a.where}`);
   }
 }
 process.exit(failed ? 1 : 0);

@@ -33,6 +33,7 @@ test("new-side lines map to GitLab's old cursor; removed and untouched lines hav
   assert.equal(p.get(43), 41);
   assert.equal(p.get(44), 41);
   assert.equal(p.has(20), false, "a line outside every hunk is not in the diff");
+  assert.deepEqual([...p.added].sort((a, b) => a - b), [11, 12, 43], "only added lines count as changed; context does not");
 });
 
 test("urls: GitLab sha1 file hash + old_new, GitHub sha256 + R<new>", () => {

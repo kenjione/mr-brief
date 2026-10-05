@@ -7,7 +7,8 @@
 //   mr-ref.mjs https://gitlab.com/group/repo/-/merge_requests/2649
 //   mr-ref.mjs 1338 --json
 //
-// Read-only on the platform. Locally it only fetches refs; the working tree never moves.
+// Read-only on the platform. Locally it only fetches refs — into refs/mr-brief/<iid>, outside
+// refs/remotes/, so a `git fetch --prune` does not delete them — and the working tree never moves.
 
 import { execFileSync } from "node:child_process";
 import { remote, api } from "./lib/remote.mjs";
@@ -25,14 +26,14 @@ let meta;
 if (r.github) {
   const pr = api(r, `repos/${r.project}/pulls/${iid}`);
   meta = { title: pr.title, author: pr.user.login, target: pr.base.ref, source: pr.head.ref, head: pr.head.sha, url: pr.html_url, description: pr.body || "", state: pr.state };
-  git("fetch", "-q", "origin", `refs/pull/${iid}/head:refs/remotes/origin/mr-brief/${iid}`, pr.base.ref);
+  git("fetch", "-q", "origin", `refs/pull/${iid}/head:refs/mr-brief/${iid}`, pr.base.ref);
 } else {
   const mr = api(r, `projects/${r.enc}/merge_requests/${iid}`);
   meta = { title: mr.title, author: mr.author.username, target: mr.target_branch, source: mr.source_branch, head: mr.sha, url: mr.web_url, description: mr.description || "", state: mr.state };
-  git("fetch", "-q", "origin", `refs/merge-requests/${iid}/head:refs/remotes/origin/mr-brief/${iid}`, mr.target_branch);
+  git("fetch", "-q", "origin", `refs/merge-requests/${iid}/head:refs/mr-brief/${iid}`, mr.target_branch);
 }
 
-const head = git("rev-parse", `refs/remotes/origin/mr-brief/${iid}`);
+const head = git("rev-parse", `refs/mr-brief/${iid}`);
 const target = `origin/${meta.target}`;
 const brief = readHead(meta.description);
 const out = {

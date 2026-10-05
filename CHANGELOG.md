@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2
+- **Where to look asks questions.** Each of the three places is the question a reviewer answers at that line, on a line the MR changed, tagged `· key change N` — and the three tags cover the three key changes. Lint refuses an entry that only names a place, or a set that leaves a claim unchecked.
+- `anchor.mjs` says when a line is context the MR did not change (one test run pointed at a comment). The claim-checker names, for each key change, the line where it is settled and the question that would prove it false.
+
 ## 0.9.1
 - **A brief says what the MR is for.** A required `**Why:**` line under the lead: the need or the problem, what could not be done or went wrong before. The lead now says who can now do what, not the state of the code.
 - **No term without its meaning.** A spec term, acronym or class name appears only with its everyday meaning in the same sentence. The claim-checker reads as a developer from the next team and lists every term that reader would have to look up; the lead and the why are checked like any other claim.

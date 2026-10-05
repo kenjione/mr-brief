@@ -5,11 +5,12 @@ import { createHash } from "node:crypto";
 // the old one. GitLab's line anchor wants both numbers; GitHub only the new one.
 export function diffPositions(diffText) {
   const pos = new Map(); let o = 0, n = 0, inHunk = false;
+  pos.added = new Set(); // new-side lines this diff adds, as opposed to context around them
   for (const l of diffText.split("\n")) {
     const h = l.match(/^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
     if (h) { o = Number(h[1]); n = Number(h[2]); inHunk = true; continue; }
     if (!inHunk || l.startsWith("+++") || l.startsWith("---") || l.startsWith("\\")) continue;
-    if (l.startsWith("+")) { pos.set(n, o); n++; }
+    if (l.startsWith("+")) { pos.set(n, o); pos.added.add(n); n++; }
     else if (l.startsWith("-")) { o++; }
     else { pos.set(n, o); o++; n++; }
   }

@@ -36,7 +36,11 @@ How to decide:
 6. **The lead and the why are claims.** The lead says who can now do what; check that the
    code lets them. The why says what could not be done before; check that against the
    target branch (`git show <base>:<path>`).
-7. **Read as a developer from the next team**, who knows the language and the framework
+7. **For each key change, name the line where it is settled** — the changed line where its
+   decision is made — and the question that would prove it false there (the edge case, the
+   concurrent call, the missing branch). That is what the brief's *Where to look* should
+   send the reviewer to; if the brief points somewhere else, say so.
+8. **Read as a developer from the next team**, who knows the language and the framework
    but has never read this spec or this codebase. For every claim, list the terms that
    reader would have to look up — spec terms, acronyms, class names, internal shorthand —
    that the sentence itself does not explain. Do not list a term the sentence explains.
@@ -47,7 +51,8 @@ never run anything that changes the repository or talks to the network.
 Write `verdicts.json` next to the packet:
 
 ```json
-[{ "id": "key-1", "verdict": "supported", "evidence": "app/x.rb:42", "note": "one sentence", "jargon": ["qesApproval", "dispatched bytes"] }]
+[{ "id": "key-1", "verdict": "supported", "evidence": "app/x.rb:42", "note": "one sentence", "jargon": ["qesApproval", "dispatched bytes"],
+  "check_at": "app/x.rb:57", "question": "can two calls both pass line 57 before either writes?" }]
 ```
 
-Then reply with one line per claim — `id · verdict · path:line · note · jargon: …` — and nothing else.
+`check_at` and `question` are for key changes only. Then reply with one line per claim — `id · verdict · path:line · note · jargon: … · check at: …` — and nothing else.

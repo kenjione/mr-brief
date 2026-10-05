@@ -96,6 +96,17 @@ boxes.forEach((b, n) => {
   if (links > 1) fail.push(`where-to-look ${n + 1} carries ${links} links; one place per entry`);
 });
 if (boxes[0] && !/\*\*Start →\*\*/.test(boxes[0])) fail.push('first where-to-look entry must begin with **Start →**');
+// Each entry is a question the reviewer answers at that line, tagged with the key change it
+// checks — so the three places verify the three claims instead of naming three locations.
+const covered = new Set();
+boxes.forEach((b, n) => {
+  const after = b.replace(/^.*?\]\(https?:\/\/[^)]*\)/, "");
+  if (!/\?/.test(after)) fail.push(`where-to-look ${n + 1} names a place, not a question — say what the reviewer answers at that line`);
+  const tag = after.match(/·\s*key change\s+([1-3])\s*$/i);
+  if (!tag) fail.push(`where-to-look ${n + 1} must end with "· key change N" — the claim it checks`);
+  else covered.add(tag[1]);
+});
+if (boxes.length === 3 && covered.size && covered.size < 3) fail.push(`where-to-look checks key change ${[...covered].sort().join(", ")} only — each of the three needs its place`);
 if (wlStart >= 0 && !/~\d+\s*min/.test(lines[wlStart])) fail.push("### Where to look heading needs a minutes estimate (~N min)");
 
 // ---- risk: exactly one blockquote group, carrying **Risk

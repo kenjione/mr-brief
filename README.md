@@ -54,9 +54,9 @@ Cancelling a subscription now also cancels every add-on billed against it.
 - **A 404 from the cancel call counts as success** — no add-ons, still cancelled
 
 ### Where to look · ~8 min · skip the 300 lines of specs
-- [ ] **Start →** [poll_subscriptions_worker.rb:45](…#L45) — where a cancelled flag becomes a cascade
-- [ ] [addon_cancellation.rb:21](…#L21) — 404 swallowed into false; the arguable bit
-- [ ] [poll_subscriptions_worker_spec.rb:92](…#L92) — proves a failing cascade does not stop the sweep
+- [ ] **Start →** [poll_subscriptions_worker.rb:45](…#L45) — is the cancelled flag read from the provider, never from the cached expiry? · key change 1
+- [ ] [addon_cancellation.rb:21](…#L21) — is a 404 the only answer turned into success? · key change 3
+- [ ] [poll_subscriptions_worker_spec.rb:92](…#L92) — does one failing subscription leave the rest of the run going? · key change 2
 
 ### Risk
 > an add-on keeps billing after cancellation — visible as `last_error`, retried. Not silent.
@@ -96,7 +96,7 @@ Every link was checked against the commit before it was written, and on an open 
 | **15 lines** of text, hard limit | the diagram does not count |
 | **Why** | one or two sentences on the need or the problem, readable without the spec |
 | **3** key changes | each a decision someone could disagree with, most contentious first |
-| **3** places to look | verified links into the MR's changes tab, caller before callee, with a minutes estimate and a `skip:` |
+| **3** places to look | one per key change: the question a reviewer answers at the changed line that decides it, linked into the MR's diff, with a minutes estimate and a `skip:` |
 | **1** risk line | worst realistic outcome, loud or silent, how to roll back |
 | **Architecture** | one line and one sequence across services — only when a service now calls one it did not |
 | **Diagram** | only when a call path, state machine, job or webhook moved; what is new marked — a rendered SVG, or mermaid folded where an image cannot be shown; never both |

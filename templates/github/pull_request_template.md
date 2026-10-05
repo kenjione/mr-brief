@@ -21,11 +21,12 @@
 - **** —
 
 ### Where to look · ~N min · skip:
-<!-- Three permalinks, in reading order, starting at the entry point.
+<!-- Three links, in reading order. Each is a QUESTION the reviewer answers at that line,
+     on a line this MR changed, and ends with the key change it checks — one per key change.
      Permalink form: <mr-url-base>/-/blob/<head-sha>/<path>#L<line> -->
-- [ ] **Start →** [file.rb:00](#) —
-- [ ] [file.rb:00](#) —
-- [ ] [spec.rb:00](#) —
+- [ ] **Start →** [file.rb:00](#) — <what to answer here>? · key change 1
+- [ ] [file.rb:00](#) — <what to answer here>? · key change 2
+- [ ] [spec.rb:00](#) — <what to answer here>? · key change 3
 
 ### Risk
 > The worst realistic outcome — does it fail loudly or silently?
