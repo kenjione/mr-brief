@@ -24,7 +24,8 @@
 <!-- Three links, in reading order. Each is a QUESTION the reviewer answers at that line,
      on a line this MR changed, and ends with the key change it checks — one per key change.
      Permalink form: <mr-url-base>/-/blob/<head-sha>/<path>#L<line> -->
-- [ ] **Start →** [file.rb:00](#) — <what to answer here>? · key change 1
+**Start →** [file.rb:00](#) — <where the scenario this MR adds is entered; what to follow down>
+- [ ] [file.rb:00](#) — <what to answer here>? · key change 1
 - [ ] [file.rb:00](#) — <what to answer here>? · key change 2
 - [ ] [spec.rb:00](#) — <what to answer here>? · key change 3
 

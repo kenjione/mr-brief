@@ -54,7 +54,8 @@ Cancelling a subscription now also cancels every add-on billed against it.
 - **A 404 from the cancel call counts as success** — no add-ons, still cancelled
 
 ### Where to look · ~8 min · skip the 300 lines of specs
-- [ ] **Start →** [poll_subscriptions_worker.rb:45](…#L45) — is the cancelled flag read from the provider, never from the cached expiry? · key change 1
+**Start →** [poll_subscriptions_worker.rb:12](…#L12) — the nightly sweep starts here; follow `perform` down
+- [ ] [poll_subscriptions_worker.rb:45](…#L45) — is the cancelled flag read from the provider, never from the cached expiry? · key change 1
 - [ ] [addon_cancellation.rb:21](…#L21) — is a 404 the only answer turned into success? · key change 3
 - [ ] [poll_subscriptions_worker_spec.rb:92](…#L92) — does one failing subscription leave the rest of the run going? · key change 2
 

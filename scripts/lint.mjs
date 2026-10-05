@@ -95,7 +95,14 @@ boxes.forEach((b, n) => {
   if (links === 0) fail.push(`where-to-look ${n + 1} is not a permalink`);
   if (links > 1) fail.push(`where-to-look ${n + 1} carries ${links} links; one place per entry`);
 });
-if (boxes[0] && !/\*\*Start →\*\*/.test(boxes[0])) fail.push('first where-to-look entry must begin with **Start →**');
+// The start is its own line under the heading, not a checkbox: where the scenario this MR adds
+// is entered, so the reviewer can follow it down before answering the three questions.
+const startAt = wlStart >= 0 ? lines.findIndex((l, i) => i > wlStart && l.trim() !== "") : -1;
+const startLine = startAt >= 0 ? lines[startAt].trim() : "";
+if (wlStart >= 0 && !/^\*\*Start →\*\*\s*\[[^\]]+\]\(https?:\/\/[^)]+\)\s+—\s+\S/.test(startLine))
+  fail.push('the first line under ### Where to look must be "**Start →** [file:line](link) — where the scenario is entered" — not a checkbox');
+if ((startLine.match(/\]\(https?:\/\//g) || []).length > 1) fail.push("the Start line carries more than one link");
+boxes.forEach((b, n) => { if (/\*\*Start →\*\*/.test(b)) fail.push(`where-to-look ${n + 1} is a checkbox carrying **Start →** — the start is its own line above the three questions`); });
 // Each entry is a question the reviewer answers at that line, tagged with the key change it
 // checks — so the three places verify the three claims instead of naming three locations.
 const covered = new Set();

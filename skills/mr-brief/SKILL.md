@@ -77,7 +77,7 @@ is attached, posted, uploaded or commented, and the checkout never moves.
 | Architecture | 1 line + the scenario as a sequence across services, only if a service now calls another it did not, or the MR is one of a set |
 | Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there; the mermaid form always under `<details>` |
 | Key changes | `###` heading; exactly **3** bullets, `**claim** — reason`, most contentious first |
-| Where to look | `###` heading carrying `~N min` and `skip:`; exactly **3** links as checkboxes, in reading order. Each is a **question the reviewer answers at a line this MR changed**, ending `· key change N` — one for each key change |
+| Where to look | `###` heading carrying `~N min` and `skip:`; a **`**Start →**` line** — where the scenario is entered — then exactly **3** checkboxes, each a **question the reviewer answers at a line this MR changed**, ending `· key change N` — one for each key change |
 | Risk | `###` heading; 1–2 lines, the only blockquote |
 
 If the change does not fit in three claims, say so before writing: *"this is N separable
@@ -112,7 +112,8 @@ sequenceDiagram ...       %% compiled from graph.json — never typed
 - **The third** — its reason
 
 ### Where to look · ~12 min · skip the 890 lines of specs
-- [ ] **Start →** [file.rb:21](…/diffs#…_21) — is X compared with what we sent, not with what came back? · key change 1
+**Start →** [routes.rb:12](…/diffs#…_12) — where the new scenario is entered; follow `create` down
+- [ ] [file.rb:21](…/diffs#…_21) — is X compared with what we sent, not with what came back? · key change 1
 - [ ] [other.rb:103](…/diffs#…_103) — can two calls both get past this before either writes? · key change 3
 - [ ] [spec.rb:92](…/diffs#…_92) — does the failing case leave the rest running? · key change 2
 
@@ -343,7 +344,12 @@ Write it the way you would say it to a colleague at their desk.
   bytes we sent, and does an answer with no "yes" fail too? · key change 1`
   Ask what would make the claim false — the edge case, the concurrent call, the missing
   branch. A question whose answer is visibly "yes" in the hunk is a wasted place. Order the
-  three in reading order; `**Start →**` on the first. One link per entry. `~N min` and one
+  three in reading order. One link per entry.
+  **Above them, the `**Start →**` line** — where the scenario this MR adds is entered: the
+  new route, the branch in an existing endpoint that now leads somewhere new, the job's
+  `perform`, the webhook handler. Not the first check, not the most interesting line: the
+  door. One line, one link, no checkbox, and what to follow down from it. Find it by walking
+  *up* from the key changes until the caller is code this MR did not write. `~N min` and one
   `skip:` clause in the heading: naming what *not* to read removes more work on a 70-file
   MR than any bullet adds. `anchor.mjs` says when a line is context the MR did not change —
   then the decision is somewhere else.
@@ -367,6 +373,7 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] The author said yes, or invoked the skill themselves
 - [ ] Every anchor came from `anchor.mjs` with `--mr` when the MR exists, and the printed line is the line you meant
 - [ ] Every key change can be checked at one of the three anchors in thirty seconds
+- [ ] The `**Start →**` line is the door into the scenario — a new route, a new branch in an entry point, a job's `perform` — not the first check
 - [ ] Each place to look is a question, on a line this MR changed, tagged with the key change it checks — the three tags cover all three
 - [ ] Each picture passes its gate, is drawn at the level of the headline change, and was drawn by this run — not carried over
 - [ ] No mermaid was typed: any block came out of `compile.mjs`, sits under `<details>`, and only because there is no SVG

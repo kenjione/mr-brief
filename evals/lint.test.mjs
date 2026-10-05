@@ -15,7 +15,7 @@ const EXPECT = {
   "fail-too-long.md": ["lines of text; the limit is 15", "banned opener", "4 key changes", "2 \"- [ ]\" entries", "not a permalink", "carries 2 links", "2 blockquotes", "needs a minutes estimate"],
   "fail-where-to-look.md": ["where-to-look 1 names a place, not a question", "where-to-look 1 must end with \"· key change N\"", "checks key change 2 only"],
   "fail-guide-too-long.md": ["reading guide has 9 files; at most 8"],
-  "fail-shape.md": ["mr-brief v1", "missing **Why:**", "missing ### Key changes", "**Architecture:** is present but empty", "must begin with **Start →**", "<summary> must be on its own line"],
+  "fail-shape.md": ["mr-brief v1", "missing **Why:**", "missing ### Key changes", "**Architecture:** is present but empty", "the first line under ### Where to look must be \"**Start →**", "<summary> must be on its own line"],
 };
 
 for (const f of readdirSync(fixtures).filter((n) => n.endsWith(".md"))) {

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.3
+- **Where to look starts at the door.** A `**Start →**` line of its own above the three questions: where the scenario the MR adds is entered — the new route, the new branch in an entry point, the job — and what to follow down. 0.9.2 had folded the start into the first question, which pointed into the middle of the flow. Lint requires the line; the claim-checker names its own door to compare.
+
 ## 0.9.2
 - **Where to look asks questions.** Each of the three places is the question a reviewer answers at that line, on a line the MR changed, tagged `· key change N` — and the three tags cover the three key changes. Lint refuses an entry that only names a place, or a set that leaves a claim unchecked.
 - `anchor.mjs` says when a line is context the MR did not change (one test run pointed at a comment). The claim-checker names, for each key change, the line where it is settled and the question that would prove it false.

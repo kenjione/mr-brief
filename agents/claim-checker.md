@@ -40,7 +40,12 @@ How to decide:
    decision is made — and the question that would prove it false there (the edge case, the
    concurrent call, the missing branch). That is what the brief's *Where to look* should
    send the reviewer to; if the brief points somewhere else, say so.
-8. **Read as a developer from the next team**, who knows the language and the framework
+8. **Name the door.** Walk up from the key changes to where the scenario this MR adds is
+   entered: the new route, the new branch in an existing endpoint, the job, the handler —
+   the first line whose caller this MR did not write. Add one entry with id `start`,
+   `check_at` set to that line, and a note on what to follow down. If the brief's **Start →**
+   points elsewhere, say so.
+9. **Read as a developer from the next team**, who knows the language and the framework
    but has never read this spec or this codebase. For every claim, list the terms that
    reader would have to look up — spec terms, acronyms, class names, internal shorthand —
    that the sentence itself does not explain. Do not list a term the sentence explains.
