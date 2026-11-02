@@ -62,7 +62,9 @@ How to decide:
      token, a log line, an error message, a response to a third party? Signed is not secret.
    - **Off.** Does the rollback or the feature flag actually stop it, everywhere it runs?
    - **Config.** Does it read settings, keys or env vars that are not declared where this
-     codebase declares them?
+     codebase declares them? Does a setting, flag or env var turn the new behaviour on that the
+     brief's `**Behind:**` line does not name, or names with the wrong default? Report it as
+     a *config* finding with the line that reads it.
    For each real finding add one entry: id `omit-1`, `omit-2` …, `"verdict": "omitted"`,
    `check_at` the line that shows it, and a `note` in one plain sentence that says what can
    happen and to whom. **Severity is set by the question, not by feel:** a finding under

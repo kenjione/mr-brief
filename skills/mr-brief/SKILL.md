@@ -67,13 +67,14 @@ is attached, posted, uploaded or commented, and the checkout never moves.
 
 ## The contract
 
-**15 lines of visible text.** The diagram does not count.
+**15 lines of visible text.** The diagram does not count, nor the `**Behind:**` line.
 
 | Element | Limit |
 |---|---|
 | Series line | 1 line, only when the MR is one of a set |
 | What changes | 1 sentence, 140 chars: **who can now do what**, in words a developer from the next team understands |
 | Why | `**Why:**` 1–2 sentences, 280 chars: the need or the problem — what someone could not do, or what went wrong, before this MR |
+| Behind | `**Behind:**` 1 line, only when the change runs only with a switch on: the key as code, where it lives (setting, feature flag, env var, per-tenant config) and its default. Absent when nothing switches it |
 | Architecture | 1 line + the scenario as a sequence across services, only if a service now calls another it did not, or the MR is one of a set |
 | Flow | one picture above the key changes, only if the wiring moved — a rendered SVG when the renderer is there; the mermaid form always under `<details>` |
 | Key changes | `###` heading; exactly **3** bullets, `**what** — why`. The first is **the change itself**: what the MR makes possible and how. Then the two most arguable decisions. Every *why* answers the reader's "why so?" |
@@ -90,7 +91,9 @@ changes — split it, or the reviewer skims."* Write it if they decline, but say
 
 One sentence: who can now do what, in everyday words.
 
-**Why:** the need or the problem behind it — what could not be done, or what went wrong, before.
+**Why:** the need or the problem behind it. What could not be done, or what went wrong, before.
+
+**Behind:** `the.switch.key` (setting), off by default. Only when a switch turns the change on.
 
 **Architecture:** one line on what now talks to what that did not before. Then its picture.
 
@@ -299,24 +302,36 @@ Write it the way you would say it to a colleague at their desk.
 
 - **Every claim answers "why so?"** The reader is a person who wants to understand, not a
   parser checking facts. A sentence that says what happens and not why it matters leaves
-  them guessing — and guessing is how a reviewer stops reading.
+  them guessing, and guessing is how a reviewer stops reading.
 - **One idea per sentence.** No semicolon stacking a second thought onto a first, no
   clause starting with "which".
 - **The everyday word wins**: *dead* over *deactivated*, *stolen* over *captured*,
   *asks for* over *declares*.
 - **No term without its meaning.** A spec term (`qesApproval`, `transaction_data`, `DPoP`),
   an acronym or a class name appears only in a sentence that also says what it is in
-  everyday words — *the wallet's signed "yes" (`qesApproval`)* — or not at all. That the
+  everyday words, *the wallet's signed "yes" (`qesApproval`)*, or not at all. That the
   change is about the term is no excuse: that is exactly when the reviewer needs to know
   what it means. The test: a developer from the next team, who has never read this spec,
   understands the lead, the why and every bold claim.
 - **Active voice, present tense.** "The sweep skips", not "will be skipped".
 - **No claim the diff does not contain.** No "faster" without a number.
 - **A claim about what a library or framework does is read in its source, not remembered.**
-  "The ORM drops unknown keys", "the client raises on 4xx" — open the gem and point at the
+  "The ORM drops unknown keys", "the client raises on 4xx": open the gem and point at the
   line, or leave the claim out. A confident wrong sentence about a dependency is the most
   expensive thing a brief can carry, because nobody checks it.
 - **Bold the claim, not the topic.** Someone reading only the bold still understands the MR.
+- **No words that give a machine away.** A reviewer who meets *crucial*, *robust*,
+  *seamless*, *comprehensive*, *leverage*, *utilize*, *streamline*, *elegant*, *powerful*,
+  *under the hood*, *the heart of* or *safety net* stops trusting the rest. Each one stands
+  where a fact should be: say what happens instead. *Robust retries* is *three retries, then
+  the row is marked failed*. Lint refuses the list; the rule is wider than the list.
+- **No metaphors.** Things are not *alive*, do not *die*, *live in* a file or *talk to*
+  each other. A token is revoked, a worker stops, a class is in a file, a service calls
+  another.
+- **The dash is a separator, not punctuation.** One dash splits a key change, the Start
+  line and a place to look into the claim and its reason. Inside a sentence, a dash is two
+  sentences glued together: end the first and start the second. An en dash or a spaced
+  hyphen is the same dash. Lint counts all three.
 - **Banned openers**: `This MR/PR …`, `In this change …`, `As part of …`, `Refactored …`,
   `Various improvements …`, `Minor fixes …`, `Added …`, `Updated …`.
 
@@ -335,6 +350,11 @@ Write it the way you would say it to a colleague at their desk.
   Bad: `**Why:** CS-03 §7.3 compliance.`
   Good: `**Why:** a signature must be for the document the user saw. Until now nothing
   checked that the wallet's approval was for the documents we sent.`
+- **Behind** — when the new behaviour only runs with a switch on, the reviewer and whoever
+  tests it need three facts before anything else: which switch, where it lives, and what it
+  is set to by default. `**Behind:** \`openid4vc.pkce_enabled\` (setting), off by default.
+  Until it is on, the authorize request works as before.` A switch the diff reads but the
+  brief does not name is how a feature gets tested with the feature off. No switch, no line.
 - **Architecture** — what now talks to what that did not before, in one line:
   `billing gains a nightly sweep worker and now asks the provider whether a subscription is still live.`
   Key changes say what was decided; the flow says what happens; this says what now
@@ -411,6 +431,8 @@ Write it the way you would say it to a colleague at their desk.
 - [ ] The lead says who can now do what, and `**Why:**` says what could not be done before — both readable without the spec
 - [ ] The first key change is the change itself, and the bold of the three reads as the story of the MR
 - [ ] After each dash there is an answer to "why so?" in terms of a person or a consequence — not the mechanism again
+- [ ] Every switch the diff reads to turn the change on is named in `**Behind:**` with its default, and the line is absent when there is none
+- [ ] Read aloud, the text sounds like a colleague talking: no intensifier, no metaphor, no dash inside a sentence
 - [ ] Every **high** finding the checker marked *omitted* is in Risk, the rest are under Open questions
 - [ ] Every key change and risk came back **supported** from the claim-checker, or was rewritten until it did, and no term it flagged is left unexplained
 - [ ] It was attached with `attach.mjs`, so line one names the commit it describes

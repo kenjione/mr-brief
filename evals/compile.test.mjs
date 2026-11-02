@@ -15,7 +15,7 @@ const doc = JSON.parse(readFileSync(join(here, "fixtures/graph.json"), "utf8"));
 
 test("architecture: one subgraph per lane, delta as class, file hint in the node", () => {
   const m = architecture(doc);
-  assert.match(m, /^flowchart TD/);
+  assert.match(m, /^---\nconfig:\n  layout: elk\n---\nflowchart TD\n/, "ELK asked for in frontmatter, dagre where the host lacks it");
   assert.match(m, /subgraph lane_billing\["billing \(this repo\)"\]/, "inside quotes, parentheses are plain text");
   assert.match(m, /n_sweep\["Add-on sweep<br\/>nightly · retry 3<br\/>addon_sweep_worker\.rb:12"\]/);
   assert.match(m, /n_row\[\("Subscription row<br\/>state, last_error"\)\]/, "a datastore is a cylinder");

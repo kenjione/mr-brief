@@ -79,7 +79,7 @@ this MR sits in it* — and every developer reads it without a legend.
 - One lifeline per service or external caller, 3–5 of them. The current repo's lifeline
   is the heavy one; a `(you are here)` in its alias says so in mermaid.
 - 8–12 messages: the calls between services, plus a self-message where a service makes a
-  decision that matters (`replayed? → whole family dies`). Nothing internal beyond that.
+  decision that matters (`replayed? → revoke every token from that login`). Nothing internal beyond that.
 - Replies dashed. Refusals named on the reply (`charge — or refuse, reason named`).
 - **Label a message with the real call when it is short** — `evaluate(chain:)`,
   `find_pinned(pseudonym:)`. It ties the arrow to a line of code the way `file.rb:163` ties
@@ -157,6 +157,9 @@ as text — four or five lines. Otherwise it goes under `<details>`.
 - Steps that were already there and did not move are not in the picture. Include an
   unchanged node only when a new one cannot be placed without it.
 - 5–9 nodes, and every label legible at page width. If labels have shrunk, cut nodes.
+- The compiler asks mermaid for the ELK layout: rows, and edges at right angles. The
+  default layout curves edges across lanes and reads as a tangle. A host without ELK draws
+  the default; nothing to do on your side but keep the picture small.
 - `TD` for anything linear. `LR` divides the page width by the chain length; keep it for
   two or three nodes or a real fan-out.
 - Draw the flow *after* the change. Never a before/after pair.

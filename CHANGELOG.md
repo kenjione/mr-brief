@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.6
+- **Words that give a machine away are refused.** Lint fails a brief that says *crucial*, *robust*, *seamless*, *leverage*, *under the hood* and the like, and asks for what happens instead. A dash is allowed only as the separator in a key change, the Start line and a place to look; inside a sentence it is two sentences glued together. The skill adds the same rules for metaphors, which lint cannot catch.
+- **`**Behind:**` names the switch.** When the change only runs with a setting, flag or env var on, one line under the why gives the key, where it lives and its default. It does not count against the 15 lines. Lint checks it has a code span and a default; the claim-checker reports a switch the diff reads that the line does not name. A feature tested with its flag off looks like a bug.
+- **Flowcharts ask for ELK.** The architecture lens compiles with `layout: elk` in mermaid frontmatter: rows and right-angled edges instead of curves across lanes. Hosts that have not registered ELK draw the default layout, so nothing breaks.
+
 ## 0.9.5
 - **Every key change answers "why so?"** The text after the dash is the reason in human terms — who is protected, what would go wrong otherwise — not the mechanism again. The first key change is the change itself, and the bold of the three reads as the story of the MR. The claim-checker asks "why so?" of each one and flags an answer that only says *how*, or a first bullet that is a detail. A test brief led with "signing codes bypass the login path" on an MR whose point was signature approval.
 

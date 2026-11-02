@@ -45,14 +45,45 @@ lines.forEach((raw, i) => {
   text.push({ i, s });
 });
 
-// ---- 15 lines
-if (text.length > 15) fail.push(`${text.length} lines of text; the limit is 15`);
+// ---- 15 lines. The **Behind:** line does not count: it is a fact for whoever turns the change
+// on, not part of the argument, and a brief behind a switch should not lose a claim to say so.
+const isBehind = (s) => /^\*\*Behind:\*\*/.test(s.trim());
+const counted = text.filter(({ s }) => !isBehind(s)).length;
+if (counted > 15) fail.push(`${counted} lines of text; the limit is 15`);
 
 // ---- first sentence
 const lead = text[0]?.s ?? "";
 if (lead.length > 140) fail.push(`opening sentence is ${lead.length} chars; the limit is 140`);
 const banned = /^(this (mr|pr|change|commit)\b|in this (change|mr|pr)\b|as part of\b|refactor(ed|s)?\b|various improvements|minor fixes|added?\b|updated?\b)/i;
 if (banned.test(lead)) fail.push(`opening sentence starts with a banned opener: "${lead.split(/\s+/).slice(0, 3).join(" ")}…"`);
+
+// ---- words a reader takes for a machine: intensifiers, stock metaphors, the dash inside a sentence.
+// Code spans, link targets and file:line link text are left out: an identifier can be called anything.
+const prose = (s) => s.replace(/`[^`]*`/g, "").replace(/\[[^\]\s]+:\d+\]/g, "[]").replace(/\]\([^)]*\)/g, "]");
+const TELLS = /\b(crucial(ly)?|robust(ly|ness)?|seamless(ly)?|comprehensive(ly)?|leverag(e|es|ed|ing)|utili[sz](e|es|ed|ing)|delv(e|es|ed|ing)|streamlin(e|es|ed|ing)|elegant(ly)?|powerful(ly)?|cutting-edge|game-chang\w*|under the hood|the heart of|safety net|paves? the way|a testament to)\b/gi;
+text.forEach(({ i, s }) => {
+  const hits = [...new Set((prose(s).match(TELLS) || []).map((w) => w.toLowerCase()))];
+  if (hits.length) fail.push(`line ${i + 1}: ${hits.map((w) => `"${w}"`).join(", ")} — say what happens instead`);
+});
+// One dash is the separator in a key change, the Start line and a where-to-look entry. Anywhere
+// else, and a second one in those, is a sentence that should have been two.
+text.forEach(({ i, s }) => {
+  const t = s.trim();
+  const separated = /^- \*\*/.test(t) || /^- \[[ xX]\]/.test(t) || /^\*\*Start →\*\*/.test(t);
+  const dashes = (prose(t).match(/—|\s[–-]\s/g) || []).length; // an en dash or a spaced hyphen is the same dash
+  if (dashes > (separated ? 1 : 0)) fail.push(`line ${i + 1}: ${separated ? "a second dash" : "a dash inside the sentence"} — end the sentence and start another`);
+});
+
+// ---- behind: when the change only runs with a switch on, name the switch, where it lives, its default
+const behindAt = text.find(({ s }) => isBehind(s))?.i ?? -1;
+if (behindAt >= 0) {
+  const behind = lines[behindAt].trim().replace(/^\*\*Behind:\*\*\s*/, "");
+  if (!/`[^`]+`/.test(behind)) fail.push("**Behind:** must name the switch as code — `the.key`");
+  if (!/\bdefault(s|ed)?\b/i.test(behind)) fail.push("**Behind:** must say the default — off by default, on by default");
+  const kc = lines.findIndex((l) => /^(###\s+|\*\*)Key changes(\*\*)?/.test(l.trim()));
+  const why = lines.findIndex((l) => /^\*\*Why:\*\*/.test(l.trim()));
+  if ((kc >= 0 && behindAt > kc) || (why >= 0 && behindAt < why)) fail.push("**Behind:** must sit under the why, above Key changes");
+}
 
 // ---- why: the need or the problem, right after the lead
 const whyAt = lines.findIndex((l) => /^\*\*Why:\*\*/.test(l.trim()));
@@ -154,4 +185,4 @@ if (dOpen >= 0) {
 notes.forEach((n) => console.log(`note: ${n}`));
 if (fail.length) { fail.forEach((f) => console.log(`✗ ${f}`)); process.exit(1); }
 const pics = mermaidBlocks + pictures;
-console.log(`ok — ${text.length} lines of text${pics === 1 ? ", one picture" : pics === 2 ? ", two pictures" : pics > 2 ? `, ${pics} pictures` : ""}`);
+console.log(`ok — ${counted} lines of text${text.length > counted ? " + Behind" : ""}${pics === 1 ? ", one picture" : pics === 2 ? ", two pictures" : pics > 2 ? `, ${pics} pictures` : ""}`);

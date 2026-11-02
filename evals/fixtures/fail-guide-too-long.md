@@ -38,7 +38,7 @@ sequenceDiagram
 - [ ] [poll_subscriptions_worker_spec.rb:92](https://gitlab.example.com/billing/core/-/blob/3f9c2a7d1e04b6c8a5f0d2e9b7c1a4f6e8d0b2c3/spec/workers/billing/poll_subscriptions_worker_spec.rb#L92) — does one subscription that fails leave the rest of the run going? · key change 2
 
 ### Risk
-> an add-on keeps billing after its subscription was cancelled — visible as `last_error` on the row and retried next sweep, not silent.
+> An add-on keeps billing after its subscription was cancelled. It is not silent: the row shows `last_error`, and the next sweep tries again.
 >
 > Rollback: flip `billing.subscription_polling_enabled` to false; a full revert also needs the diagnostics migration rolled back.
 

@@ -58,8 +58,13 @@ function shape(node, label) {
   }
 }
 
+// ELK lays a flowchart out in rows with right-angled edges; the default (dagre) curves edges
+// across lanes and reads as a tangle. A host that has not registered ELK draws with dagre,
+// so asking costs nothing where it is missing.
+const ELK = ["---", "config:", "  layout: elk", "---"];
+
 export function architecture(d) {
-  const lines = ["flowchart TD"];
+  const lines = [...ELK, "flowchart TD"];
   const nodes = d.nodes || [], lanes = [...(d.lanes || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   const byClass = new Map(), external = [];
   const emit = (node, indent) => {
