@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- **A brief closes its issue.** One line per issue right under the marker: `Closes #12` when the MR finishes it, `Part of #12` when it does a share. Before, the ticket sat only on the series line or as a bare `#12`, which links but leaves the issue open after the merge; and since `attach.mjs` replaces the whole description, a closing line typed by hand was lost. Lint keeps these lines out of the lead and the 15 lines, and fails one that sits lower in the brief; `claims.mjs` no longer hands the checker `Closes #12` as the lead. A line counts only when it holds nothing but keywords and references, each reference with its own keyword (GitHub closes only #1 in `Closes #1, #2`), so a lead like *Fixes #12 for guests* stays the lead. `No issue` says there is none. The skill, its checklist and both templates carry the line.
+
 ## 0.9.6
 - **Words that give a machine away are refused.** Lint fails a brief that says *crucial*, *robust*, *seamless*, *leverage*, *under the hood* and the like, and asks for what happens instead. A dash is allowed only as the separator in a key change, the Start line and a place to look; inside a sentence it is two sentences glued together. The skill adds the same rules for metaphors, which lint cannot catch.
 - **`**Behind:**` names the switch.** When the change only runs with a setting, flag or env var on, one line under the why gives the key, where it lives and its default. It does not count against the 15 lines. Lint checks it has a code span and a default; the claim-checker reports a switch the diff reads that the line does not name. A feature tested with its flag off looks like a bug.

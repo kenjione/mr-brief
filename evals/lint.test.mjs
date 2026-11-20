@@ -3,7 +3,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,6 +17,7 @@ const EXPECT = {
   "fail-where-to-look.md": ["where-to-look 1 names a place, not a question", "where-to-look 1 must end with \"· key change N\"", "checks key change 2 only"],
   "fail-guide-too-long.md": ["reading guide has 9 files; at most 8"],
   "fail-ai-tells.md": ["line 3: \"robust\"", "line 3: a dash inside the sentence", "line 11: \"seamlessly\"", "line 11: a second dash", "**Behind:** must name the switch as code", "**Behind:** must say the default"],
+  "fail-issue-line.md": ["line 5: \"Fixes #12\" must sit right under the marker, above the lead"],
   "fail-shape.md": ["mr-brief v1", "missing **Why:**", "missing ### Key changes", "**Architecture:** is present but empty", "the first line under ### Where to look must be \"**Start →**", "<summary> must be on its own line"],
 };
 
@@ -31,3 +33,11 @@ for (const f of readdirSync(fixtures).filter((n) => n.endsWith(".md"))) {
     }
   });
 }
+
+test("an issue line inside a code block is an example, not a misplaced line", () => {
+  const brief = readFileSync(join(fixtures, "pass-minimal.md"), "utf8").replace("### Risk", "```\nFixes #12\n```\n\n### Risk");
+  const file = join(mkdtempSync(join(tmpdir(), "mr-brief-")), "brief.md");
+  writeFileSync(file, brief);
+  const r = spawnSync("node", [lint, file], { encoding: "utf8" });
+  assert.ok(!r.stdout.includes("must sit right under the marker"), r.stdout);
+});

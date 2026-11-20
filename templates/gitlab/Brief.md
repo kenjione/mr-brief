@@ -1,4 +1,5 @@
 <!-- mr-brief v1 -->  <!-- TICKET · 2 of 3 · after repo_a!11, before repo_c!33 — delete unless this MR is one of a set -->
+<!-- Closes #N: one line per issue this MR finishes, so the merge closes it. "Part of #N" for a share, "No issue" when there is none. A bare #N only links. Take the line out of the comment. -->
 
 <!-- One sentence, max 140 chars: who can now do what, in words a developer from the next team understands. Not "This MR ...". -->
 

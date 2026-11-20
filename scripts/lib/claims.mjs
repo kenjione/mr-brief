@@ -1,12 +1,15 @@
 // What a brief claims, and where it says to look. Pure functions over the brief's text, so
 // the packet a checker reads is built the same way every time and can be tested.
 
+import { issueLines } from "./issue.mjs";
+
 // The three key changes and the risk paragraphs — the sentences a reviewer will believe.
 export function extractClaims(text) {
   const lines = String(text).split("\n");
   const claims = [];
-  // The lead: the first prose line after the marker that is not a series line, a label or a picture.
-  const lead = lines.slice(1).find((l) => l.trim() && !/^(\*\*|!\[|<|#|>|-|```|\*[^*])/.test(l.trim()));
+  // The lead: the first prose line after the marker that is not an issue line, a label or a picture.
+  const skip = issueLines(lines);
+  const lead = lines.find((l, i) => i > 0 && !skip.has(i) && l.trim() && !/^(\*\*|!\[|<|#|>|-|```|\*[^*])/.test(l.trim()));
   if (lead) claims.push({ id: "lead", kind: "lead", text: plain(lead) });
   const why = lines.find((l) => /^\*\*Why:\*\*/.test(l.trim()));
   if (why) claims.push({ id: "why", kind: "why", text: plain(why.replace(/^\s*\*\*Why:\*\*\s*/, "")) });

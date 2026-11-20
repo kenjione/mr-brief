@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { readHead, stampHead, isStale } from "../scripts/lib/marker.mjs";
 import { extractClaims, extractLinks } from "../scripts/lib/claims.mjs";
+import { isIssueLine, issueLines } from "../scripts/lib/issue.mjs";
 import { pathFromDiffUrl, diffUrl } from "../scripts/lib/diff-anchor.mjs";
 import { parseRemote } from "../scripts/lib/remote.mjs";
 import { summarize, countBoxes, median } from "../scripts/lib/metrics.mjs";
@@ -79,4 +80,18 @@ test("metrics: medians per group, review-less MRs counted, ticked share only whe
   assert.equal(s.without.ticked, null);
   assert.equal(median([]), null);
   assert.deepEqual(countBoxes("- [ ] a\n- [x] b\n* [X] c\ntext [ ] d"), { boxes: 3, ticked: 2 });
+});
+
+test("issue lines: only keywords and references, right under the marker", () => {
+  for (const l of ["Closes #12", "closes #12.", "FIX #12", "PART OF #3", "Fixing #4", "Fixes acme/payments#7", "Resolves BILL-12", "Part of #3",
+    "Closes #1, closes #2", "Closes #1 and fixes #2", "Closes https://gitlab.example.com/g/r/-/issues/4", "Fixes https://acme.atlassian.net/browse/BILL-9",
+    "No issue", "Closes #12  <!-- one line per issue -->"])
+    assert.ok(isIssueLine(l), `issue line: ${l}`);
+  for (const l of ["Fixes #12 for guests who could not log in.", "Fixes login-2 crash on retry.", "Closes the gap between plans.", "#12",
+    "No issue reaches the queue now.", "Closes #1, #2", "Closes #1 and #2", "Closes https://example.com/docs/setup", "<!-- Closes #12 -->"])
+    assert.ok(!isIssueLine(l), `not an issue line: ${l}`);
+  const lines = "<!-- mr-brief v1 -->  BILL-1\nCloses #12\n<!-- a note -->\nPart of #3\nThe lead.\nCloses #9".split("\n");
+  assert.deepEqual([...issueLines(lines)], [1, 3], "a comment is skipped, the block stops at the lead");
+  const claims = extractClaims("<!-- mr-brief v1 -->\nCloses #12  <!-- from the template -->\n\nGuests can now log in.\n\n**Why:** they could not.");
+  assert.equal(claims[0].text, "Guests can now log in.", "the issue line is not the lead the checker reads");
 });

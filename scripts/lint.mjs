@@ -9,6 +9,7 @@
 
 import { readFileSync } from "node:fs";
 import { MARKER, readHead, isStale } from "./lib/marker.mjs";
+import { isIssueLine, issueLines } from "./lib/issue.mjs";
 
 const argv = process.argv.slice(2);
 const file = argv.find((a, i) => !a.startsWith("--") && argv[i - 1] !== "--head");
@@ -24,6 +25,9 @@ const notes = [];
 const head = readHead(src);
 if (current && head && isStale(head, current)) notes.push(`stale — the brief describes ${head.slice(0, 9)}, the MR is at ${current.slice(0, 9)}: re-run /mr-brief, or check the claims still hold`);
 if (current && head === null) notes.push("the brief names no commit (no head= on line one) — it cannot tell when it went stale");
+
+// ---- issue lines (`Closes #12` under the marker): not text, not the lead. See lib/issue.mjs.
+const issueAt = issueLines(lines);
 
 // ---- carve out what does not count as text: mermaid blocks (+ one legend line), <details>
 let inMermaid = false, inDetails = false, afterMermaid = false, mermaidBlocks = 0, mermaidAt = -1, pictures = 0, pictureAt = -1, foldedPictures = 0, foldedAt = -1;
@@ -42,7 +46,15 @@ lines.forEach((raw, i) => {
   if (s.trim() === "" || s.trim() === ">" || /^-{3,}$/.test(s.trim())) return; // blank, the bare quote separator, or a rule
   if (/^!\[[^\]]*\]\([^)]+\)\s*$/.test(s.trim())) { pictures++; pictureAt = i; afterMermaid = true; return; } // a rendered picture; the next italic line is its legend
   if (i === 0) return; // marker / series line
+  if (issueAt.has(i)) return; // Closes #N
   text.push({ i, s });
+});
+// An issue line lower down is misplaced. Inside a code block it is an example, not a line.
+let fenced = false;
+const inCode = new Set();
+lines.forEach((l, i) => { if (/^\s*```/.test(l)) { fenced = !fenced; return; } if (fenced) inCode.add(i); });
+text.forEach(({ i, s }) => {
+  if (!inCode.has(i) && isIssueLine(s)) fail.push(`line ${i + 1}: "${s.trim()}" must sit right under the marker, above the lead`);
 });
 
 // ---- 15 lines. The **Behind:** line does not count: it is a fact for whoever turns the change
